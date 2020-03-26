@@ -52,8 +52,14 @@ client.on("message", message => {
   } else if (text === "wimp" || text === "~desperado") {
     userArray[author].desperado = false;
     message.channel.send('You are no longer a desperado!')
-  } else if (text === "Schadenfreude" || text === "the-s-word") {
-    userArray[author].schadenfreude();
+  } else if (
+      text === "schadenfreude" || 
+      text === "the-s-word" || 
+      text === "the s word" || 
+      text === "the joyful feelings of pleasure from watching someone fail" || 
+      text === "haha nerd"
+    ) {
+    userArray[author].schadenfreude(message.channel);
   } else if (text.startsWith("flip")) {
     if(text === "flip"){
       text = "flip 1"
@@ -133,24 +139,20 @@ function flipCard(author, numberOfCards) {
   return generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
 }
 
-function is_face_card(card){
+function isFaceCard(card){
   const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
-    for(var j = 0; j < faceCardNames.length; j++){
-      if(card.includes(faceCardNames[j])){
-        return true
-      }
+  for(var j = 0; j < faceCardNames.length; j++){
+    if(card.includes(faceCardNames[j])){
+      return true
     }
-    return false
-}
-
-function is_joker(card,desperado){
-  if(card === "Joker"){
-    return true
-  } else if ((card === "Queen of Diamonds") && userArray[author].desperado){
-    return true
-  } else{
-    return false
   }
+  return false
+}
+function isJoker(card, isDesperado){
+  return (card === "Joker") || ((card === "Queen of Diamonds") && isDesperado)  
+}
+function isCritical(card, isDesperado){
+  return (card === "Queen of Hearts") || ((card === "Ace of Spades") && isDesperado)
 }
 
 
@@ -161,17 +163,12 @@ function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
   var critical = 0
   for(var i = 0; i < hand.length; i++){
     var card = hand[i]
-    if(is_joker(card,isDesperado)){
+    if(isJoker(card, isDesperado)){
       jokers += 1
-    } else if(card === "Queen of Hearts") {
+    } else if(isCritical(card, isDesperado)) {
       critical += 1
-    } else if(card === "Ace of Spades" && isDesperado ) {
-      critical += 1
-    } else {
-      if(is_face_card(card))
-      {
-          faceCards += 1
-      }
+    } else if(isFaceCard(card)) {
+      faceCards += 1
     }
   }
 
@@ -239,7 +236,7 @@ class Deck{
     this.discardHand()
     var cardsToShuffleBackIn = []
     for(var i = 0; i < this.discard.length; i++){
-      if(this.discard[i] == "Queen of Hearts" || this.discard[i] == "Joker"){
+      if(isCritical(this.discard[i], this.desperado) || isJoker(this.discard[i], this.desperado)){
         cardsToShuffleBackIn.push(this.discard[i])
       }
     }
@@ -258,20 +255,16 @@ class Deck{
     this.discardHand()
 
     // reveal one card
-    let card = userArray[author].deal();
+    let card = this.deal();
     
-    if (is_face_card(card) || is_joker(card,this.desperado)){
-      channel.send("You flipped a ${card}. You get 1 drive")
-  
+    if (isFaceCard(card) || isJoker(card, this.desperado)){
+      channel.send(`You flipped a ${card}, +1 drive`)
       // add back into deck
-       this.deck.push(card)
-       this.hand = []
-       
-       //shuffle in
-       this.shuffle()
-    }
-    else{
-      channel.send("You flipped a ${card}. No Drive")
+      this.deck.push(card)
+      this.hand = []
+      this.shuffle()
+    } else {
+      channel.send(`You flipped a ${card}, no drive`)
       this.discardHand()
     }
         
