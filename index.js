@@ -90,7 +90,7 @@ client.on("message", message => {
     // Handles the "Extra Explosions" ultimate 
     userArray[author].boom()
     message.channel.send("Jokers and the Queen of Hearts have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
-  else if (text.startsWith("show deck")) {
+  }else if (text.startsWith("show deck")) {
     // Prints the deck for debug
     var string = "Cards in deck: \n"
     var arrayToPrint = userArray[author].deck.slice().sort()
