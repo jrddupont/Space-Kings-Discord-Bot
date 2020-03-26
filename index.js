@@ -49,6 +49,12 @@ client.on("message", message => {
   } else if (text.startsWith("flip")) {
     // split off the number of cards to flip
     var rawNumber = text.split(" ")[1]
+
+    if(rawNumber == null){
+      message.channel.send("How many should I flip?")
+      return
+    }
+
     var number = parseInt(rawNumber, 10)
     // Check for... special cases
     if(number == 69 || number == 420){
