@@ -139,7 +139,6 @@ function flipCard(author, numberOfCards) {
   return generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
 }
 
-<<<<<<< HEAD
 function is_face_card(card){
   const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
     for(var j = 0; j < faceCardNames.length; j++){
@@ -160,10 +159,8 @@ function is_joker(card,desperado){
   }
 }
 
-function generateFlipMessage(hand, deck) {
-=======
+
 function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
->>>>>>> upstream/master
 
   var jokers = 0
   var faceCards = 0
@@ -176,11 +173,6 @@ function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
       critical += 1
     } else if(card === "Ace of Spades" && isDesperado ) {
       critical += 1
-<<<<<<< HEAD
-=======
-    } else if(card === "Queen of Diamonds" && isDesperado) {
-      jokers += 1
->>>>>>> upstream/master
     } else {
       if(is_face_card(card))
       {
