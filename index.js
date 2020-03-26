@@ -3,19 +3,26 @@ const fs = require('fs');
 
 const client = new Discord.Client()
 
+// When the bot logs in
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`)
 })
 
+// An array of all the people who have typed anything as a KV pair
+// IE ["adam" -> deck1, "eve" -> deck2]
 var userArray = {}
 
+// When the bot recieves any message
 client.on("message", message => {
 
+  // Who sent the message, this is the K in the KV pair above
   var author = message.author
 
   var text = message.content
+  // Every type of prefix that is acceptable
   var acceptablePrefixes = ["`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "]
   var prefixFound = false
+  // Search all the prefixes for one that fits, and remove it from the message
   for (var i = 0; i < acceptablePrefixes.length; i++) {
     if(message.content.startsWith(acceptablePrefixes[i])){
       prefixFound = true
@@ -23,15 +30,16 @@ client.on("message", message => {
       break
     }
   }
-
   if(!prefixFound){
     return
   }
 
+  // Initialize new users
   if(!(author in userArray)){
     userArray[author] = new Deck()
   }
 
+  // Here are all the commands
   if (text === "shuffle") {
     userArray[author].reset()
     userArray[author].shuffle()
@@ -39,13 +47,17 @@ client.on("message", message => {
   } else if (text === "curse you!") {
     message.channel.send('You deservered it')
   } else if (text.startsWith("flip")) {
+    // split off the number of cards to flip
     var rawNumber = text.split(" ")[1]
     var number = parseInt(rawNumber, 10)
+    // Check for... special cases
     if(number == 69 || number == 420){
       message.channel.send("nice")
       return
     }
-    if(Number.isInteger(parseInt(number, 10)) && number > 0 && number < 50){
+    // Make sure it is an integer and not too large
+    if(Number.isInteger(parseInt(number, 10)) && number > 0 && number < 40){
+      // Some more logic to prevent huge flips
       if(text.includes("!")){
         flipCard(message.channel, author, number)
       } else {
@@ -55,14 +67,16 @@ client.on("message", message => {
           flipCard(message.channel, author, number)
         }
       }
-      
     } else {
+      // >:(
       message.channel.send(rawNumber + " was not a nice number! >:(")
     }
   }else if (text.startsWith("boom")) {
+    // Handles the "Extra Explosions" ultimate 
     userArray[author].boom()
     message.channel.send("Jokers and the Queen of Hearts have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
   }else if (text.startsWith("show deck")) {
+    // Prints the deck for debug
     var string = "Cards in deck: \n"
     var arrayToPrint = userArray[author].deck.slice().sort()
     for(var i = 0; i < arrayToPrint.length; i++){
@@ -72,13 +86,16 @@ client.on("message", message => {
   }
 })
 
+// Read the private token from the disk and uses it to start the bot
 var token = JSON.parse(fs.readFileSync('token.json')).token
 client.login(token)
 
-
+// Flips n cards
 function flipCard(channel, author, numberOfCards) {
+  // Make sure there is no open hand
   userArray[author].discardHand()
 
+  // Deal the cards and also count jokers, face cards, and criticals
   var jokers = 0
   var faceCards = 0
   var critical = 0
@@ -98,11 +115,14 @@ function flipCard(channel, author, numberOfCards) {
       }
     }
   }
+  // Construct a string to send
   var string = "You flipped: \n"
+  // Add all the flipped cards
   for(var i = 0; i < userArray[author].hand.length; i++){
     string += "-" + userArray[author].hand[i] + "\n"
   }
 
+  // Make sure the "you flipped" sentance is grammatically correct 
   if(faceCards == 0){
     string += `You flipped no face cards, `
   } else if (faceCards == 1){
@@ -132,13 +152,12 @@ function flipCard(channel, author, numberOfCards) {
   } else {
     string += "You have " + userArray[author].deck.length + " cards remaining."
   }
-
-  
-
+  // Post result
   channel.send(string)
 }
 
 
+// I found this online, edited it a lot 
 class Deck{
   constructor(){
     this.deck = [];
@@ -148,6 +167,7 @@ class Deck{
     this.shuffle();
   }
 
+  // Discard hand, move queen of hearts and jokers into deck, shuffle deck
   boom(channel){
     this.discardHand()
     var cardsToShuffleBackIn = []
@@ -167,11 +187,13 @@ class Deck{
     channel.send(cardsToShuffleBackIn)
   }
 
+  // Move cards from the hand into the discard
   discardHand(){
     this.discard = this.discard.concat(this.hand)
     this.hand = []
   }
 
+  // Totally recreates the deck, but does not shuffle it. 
   reset(){
     this.deck = [];
     this.hand = [];
@@ -189,6 +211,7 @@ class Deck{
     this.deck.push("Joker");
   }
 
+  // Yup, this is probably fine
   shuffle(){
     const { deck } = this;
     let m = deck.length, i;
@@ -202,6 +225,7 @@ class Deck{
     return this;
   }
 
+  // Move the top card into the hand and return that card also
   deal(){
     if(this.deck.length < 1){
       this.deck = this.discard
