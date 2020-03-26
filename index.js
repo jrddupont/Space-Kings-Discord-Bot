@@ -55,6 +55,8 @@ client.on("message", message => {
       message.channel.send("nice")
       return
     }
+	
+		
     // Make sure it is an integer and not too large
     if(Number.isInteger(parseInt(number, 10)) && number > 0 && number < 40){
       // Some more logic to prevent huge flips
@@ -67,7 +69,10 @@ client.on("message", message => {
           flipCard(message.channel, author, number)
         }
       }
-    } else {
+    } else if number == ""{
+		// Flip without param should return one flip
+		flipCard(message.channel, author, 1)
+	}else {
       // >:(
       message.channel.send(rawNumber + " was not a nice number! >:(")
     }
@@ -75,6 +80,9 @@ client.on("message", message => {
     // Handles the "Extra Explosions" ultimate 
     userArray[author].boom()
     message.channel.send("Jokers and the Queen of Hearts have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
+  }else if (text.startsWith("drive")) {
+    // flips a card for drive
+    flipCard(message.channel, author, number)
   }else if (text.startsWith("show deck")) {
     // Prints the deck for debug
     var string = "Cards in deck: \n"
