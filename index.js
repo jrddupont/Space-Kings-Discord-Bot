@@ -46,7 +46,16 @@ client.on("message", message => {
     message.channel.send('Deck shuffled!')
   } else if (text === "curse you!") {
     message.channel.send('You deservered it')
+  } else if (text === "desperado") || (text === "billy the kid") {
+    userArray[author].desperado = true;
+    message.channel.send('You are now a desperado!')
+  } else if (text === "wimp") || (text === "~desperado") {
+    userArray[author].desperado = false;
+    message.channel.send('You are no longer a desperado!')
   } else if (text.startsWith("flip")) {
+    if(text === "flip"){
+      text = "flip 1"
+    }
     // split off the number of cards to flip
     var rawNumber = text.split(" ")[1]
     var number = parseInt(rawNumber, 10)
@@ -66,7 +75,8 @@ client.on("message", message => {
         if(number > 15){
           message.channel.send("Are you sure you want to flip that many? Add a space and an exclamation point after the command to confirm!")
         } else {
-          flipCard(message.channel, author, number)
+          var textToSend = flipCard(author, number)
+          message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
         }
       }
     } else if number == ""{
@@ -91,6 +101,15 @@ client.on("message", message => {
       string += "-" + arrayToPrint[i] + "\n"
     }
     message.channel.send(string)
+  }else if (text.startsWith("drive")) {
+    if(userArray[author].lastMessage == null){
+      message.channel.send("Please flip some cards before you use drive.")
+    }else{ 
+      userArray[author].deal()
+      var textToSend = generateFlipMessage(userArray[author].hand, userArray[author].deck)
+      userArray[author].lastMessage.edit(textToSend)
+      message.edit("Test")
+    }
   }
 })
 
@@ -99,20 +118,33 @@ var token = JSON.parse(fs.readFileSync('token.json')).token
 client.login(token)
 
 // Flips n cards
-function flipCard(channel, author, numberOfCards) {
+function flipCard(author, numberOfCards) {
   // Make sure there is no open hand
   userArray[author].discardHand()
+  // Generate the hand 
+  for(var i = 0; i < numberOfCards; i++){
+    userArray[author].deal();
+  }
 
   // Deal the cards and also count jokers, face cards, and criticals
+  return generateFlipMessage(userArray[author].hand, userArray[author].deck)
+}
+
+function generateFlipMessage(hand, deck) {
+
   var jokers = 0
   var faceCards = 0
   var critical = 0
-  for(var i = 0; i < numberOfCards; i++){
-    var card = userArray[author].deal();
+  for(var i = 0; i < hand.length; i++){
+    var card = hand[i]
     if(card === "Joker"){
       jokers += 1
     } else if(card === "Queen of Hearts") {
       critical += 1
+    } else if(card === "Ace of Spades") && userArray[author].desperado{
+      critical += 1
+    } else if(card === "Queen of Diamonds") && userArray[author].desperado{
+      jokers += 1
     } else {
       const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
       for(var j = 0; j < faceCardNames.length; j++){
@@ -123,11 +155,12 @@ function flipCard(channel, author, numberOfCards) {
       }
     }
   }
+
   // Construct a string to send
   var string = "You flipped: \n"
   // Add all the flipped cards
-  for(var i = 0; i < userArray[author].hand.length; i++){
-    string += "-" + userArray[author].hand[i] + "\n"
+  for(var i = 0; i < hand.length; i++){
+    string += "-" + hand[i] + "\n"
   }
 
   // Make sure the "you flipped" sentance is grammatically correct 
@@ -155,13 +188,13 @@ function flipCard(channel, author, numberOfCards) {
     string += `and ${critical} Queen of Hearts!!!\n`
   }
 
-  if(userArray[author].deck.length == 1){
+  if(deck.length == 1){
     string += "You have 1 card remaining."
   } else {
-    string += "You have " + userArray[author].deck.length + " cards remaining."
+    string += "You have " + deck.length + " cards remaining."
   }
   // Post result
-  channel.send(string)
+  return string
 }
 
 
@@ -171,8 +204,10 @@ class Deck{
     this.deck = [];
     this.hand = [];
     this.discard = [];
+    this.lastMessage = null;
     this.reset();
     this.shuffle();
+    this.desperado = false;
   }
 
   // Discard hand, move queen of hearts and jokers into deck, shuffle deck
@@ -206,7 +241,8 @@ class Deck{
     this.deck = [];
     this.hand = [];
     this.discard = [];
-
+    this.desperado = false;
+    
     const suits = ['Hearts', 'Spades', 'Clubs', 'Diamonds'];
     const values = ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King'];
 
