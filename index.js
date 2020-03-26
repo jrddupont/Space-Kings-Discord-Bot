@@ -167,7 +167,7 @@ function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
   var critical = 0
   for(var i = 0; i < hand.length; i++){
     var card = hand[i]
-    if(is_joker(card,userArray[author].desperado)){
+    if(is_joker(card,isDesperado)){
       jokers += 1
     } else if(card === "Queen of Hearts") {
       critical += 1
