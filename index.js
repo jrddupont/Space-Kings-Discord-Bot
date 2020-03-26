@@ -52,6 +52,8 @@ client.on("message", message => {
   } else if (text === "wimp") || (text === "~desperado") {
     userArray[author].desperado = false;
     message.channel.send('You are no longer a desperado!')
+  } else if (text === "Schadenfreude" || text === "the-s-word") {
+    userArray[author].schadenfreude();
   } else if (text.startsWith("flip")) {
     if(text === "flip"){
       text = "flip 1"
@@ -130,6 +132,26 @@ function flipCard(author, numberOfCards) {
   return generateFlipMessage(userArray[author].hand, userArray[author].deck)
 }
 
+function is_face_card(card){
+  const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
+    for(var j = 0; j < faceCardNames.length; j++){
+      if(card.includes(faceCardNames[j])){
+        return true
+      }
+    }
+	return false
+}
+
+function is_joker(card,desperado){
+  if(card === "Joker"){
+    return true
+  } else if ((card === "Queen of Diamonds") && userArray[author].desperado){
+    return true
+  } else{
+    return false
+  }
+}
+
 function generateFlipMessage(hand, deck) {
 
   var jokers = 0
@@ -137,21 +159,16 @@ function generateFlipMessage(hand, deck) {
   var critical = 0
   for(var i = 0; i < hand.length; i++){
     var card = hand[i]
-    if(card === "Joker"){
+    if(is_joker(card,userArray[author].desperado)){
       jokers += 1
     } else if(card === "Queen of Hearts") {
       critical += 1
     } else if(card === "Ace of Spades") && userArray[author].desperado{
       critical += 1
-    } else if(card === "Queen of Diamonds") && userArray[author].desperado{
-      jokers += 1
     } else {
-      const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
-      for(var j = 0; j < faceCardNames.length; j++){
-        if(card.includes(faceCardNames[j])){
+      if(is_face_card(card))
+	  {
           faceCards += 1
-          break
-        }
       }
     }
   }
@@ -229,7 +246,29 @@ class Deck{
     this.shuffle()
     channel.send(cardsToShuffleBackIn)
   }
-
+  
+  schadenfreude(channel) {
+    this.discardHand()
+	
+	// reveal one card
+	let card = userArray[author].deal();
+	
+	if (is_face_card(card) || is_joker(card,this.desperado)){
+      channel.send("You flipped a ${card}. You get 1 drive")
+	  
+	  // add back into deck
+	   this.deck.push(card)
+	   this.hand = []
+	   
+	   //shuffle in
+	   this.shuffle()
+	}
+	else{
+      channel.send("You flipped a ${card}. No Drive")
+	  this.discardHand()
+	}
+		
+  }
   // Move cards from the hand into the discard
   discardHand(){
     this.discard = this.discard.concat(this.hand)
