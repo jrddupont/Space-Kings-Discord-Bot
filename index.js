@@ -46,6 +46,12 @@ client.on("message", message => {
     message.channel.send('Deck shuffled!')
   } else if (text === "curse you!") {
     message.channel.send('You deservered it')
+  } else if (text === "desperado") || (text === "billy the kid") {
+    userArray[author].desperado = true;
+    message.channel.send('You are now a desperado!')
+  } else if (text === "wimp") || (text === "~desperado") {
+    userArray[author].desperado = false;
+    message.channel.send('You are no longer a desperado!')
   } else if (text.startsWith("flip")) {
     if(text === "flip"){
       text = "flip 1"
@@ -127,6 +133,10 @@ function generateFlipMessage(hand, deck) {
       jokers += 1
     } else if(card === "Queen of Hearts") {
       critical += 1
+    } else if(card === "Ace of Spades") && userArray[author].desperado{
+      critical += 1
+    } else if(card === "Queen of Diamonds") && userArray[author].desperado{
+      jokers += 1
     } else {
       const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
       for(var j = 0; j < faceCardNames.length; j++){
@@ -189,6 +199,7 @@ class Deck{
     this.lastMessage = null;
     this.reset();
     this.shuffle();
+    this.desperado = false;
   }
 
   // Discard hand, move queen of hearts and jokers into deck, shuffle deck
@@ -222,7 +233,8 @@ class Deck{
     this.deck = [];
     this.hand = [];
     this.discard = [];
-
+    this.desperado = false;
+    
     const suits = ['Hearts', 'Spades', 'Clubs', 'Diamonds'];
     const values = ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King'];
 
