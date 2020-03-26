@@ -20,7 +20,7 @@ client.on("message", message => {
 
   var text = message.content
   // Every type of prefix that is acceptable
-  var acceptablePrefixes = ["`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "]
+  var acceptablePrefixes = ["~", "`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "]
   var prefixFound = false
   // Search all the prefixes for one that fits, and remove it from the message
   for (var i = 0; i < acceptablePrefixes.length; i++) {
@@ -46,10 +46,10 @@ client.on("message", message => {
     message.channel.send('Deck shuffled!')
   } else if (text === "curse you!") {
     message.channel.send('You deservered it')
-  } else if (text === "desperado") || (text === "billy the kid") {
+  } else if (text === "desperado" || text === "billy the kid") {
     userArray[author].desperado = true;
     message.channel.send('You are now a desperado!')
-  } else if (text === "wimp") || (text === "~desperado") {
+  } else if (text === "wimp" || text === "~desperado") {
     userArray[author].desperado = false;
     message.channel.send('You are no longer a desperado!')
   } else if (text.startsWith("flip")) {
@@ -65,10 +65,11 @@ client.on("message", message => {
       return
     }
     // Make sure it is an integer and not too large
-    if(Number.isInteger(parseInt(number, 10)) && number > 0 && number < 40){
+    if(Number.isInteger(parseInt(number, 10)) && number > 0 && number <= 54){
       // Some more logic to prevent huge flips
       if(text.includes("!")){
-        flipCard(message.channel, author, number)
+        var textToSend = flipCard(author, number)
+        message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
       } else {
         if(number > 15){
           message.channel.send("Are you sure you want to flip that many? Add a space and an exclamation point after the command to confirm!")
@@ -97,10 +98,15 @@ client.on("message", message => {
     if(userArray[author].lastMessage == null){
       message.channel.send("Please flip some cards before you use drive.")
     }else{ 
-      userArray[author].deal()
-      var textToSend = generateFlipMessage(userArray[author].hand, userArray[author].deck)
-      userArray[author].lastMessage.edit(textToSend)
-      message.edit("Test")
+      if(userArray[author].deck.length == 0){
+        message.channel.send("You have no more cards to flip!")
+      }else{
+        message.delete()
+        userArray[author].deal()
+        userArray[author].driveUsed += 1
+        var textToSend = generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
+        userArray[author].lastMessage.edit(textToSend)
+      }
     }
   }
 })
@@ -113,16 +119,17 @@ client.login(token)
 function flipCard(author, numberOfCards) {
   // Make sure there is no open hand
   userArray[author].discardHand()
+  userArray[author].driveUsed = 0
   // Generate the hand 
-  for(var i = 0; i < numberOfCards; i++){
+  for(var i = 0; i < numberOfCards; i++){ 
     userArray[author].deal();
   }
 
   // Deal the cards and also count jokers, face cards, and criticals
-  return generateFlipMessage(userArray[author].hand, userArray[author].deck)
+  return generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
 }
 
-function generateFlipMessage(hand, deck) {
+function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
 
   var jokers = 0
   var faceCards = 0
@@ -133,9 +140,9 @@ function generateFlipMessage(hand, deck) {
       jokers += 1
     } else if(card === "Queen of Hearts") {
       critical += 1
-    } else if(card === "Ace of Spades") && userArray[author].desperado{
+    } else if(card === "Ace of Spades" && isDesperado ) {
       critical += 1
-    } else if(card === "Queen of Diamonds") && userArray[author].desperado{
+    } else if(card === "Queen of Diamonds" && isDesperado) {
       jokers += 1
     } else {
       const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
@@ -173,17 +180,21 @@ function generateFlipMessage(hand, deck) {
   }
 
   if(critical == 0){
-    string += `and no Queen of Hearts.\n`
+    string += `and no criticals.\n`
   } else if (critical == 1){
-    string += `and 1 Queen of Hearts!\n`
+    string += `and 1 critical!\n`
   } else {
-    string += `and ${critical} Queen of Hearts!!!\n`
+    string += `and ${critical} criticals!!!\n`
   }
 
   if(deck.length == 1){
-    string += "You have 1 card remaining."
+    string += "You have 1 card remaining.\n"
   } else {
-    string += "You have " + deck.length + " cards remaining."
+    string += "You have " + deck.length + " cards remaining.\n"
+  }
+
+  if (driveUsed >= 1){
+    string += `Used ${driveUsed} drive${"!".repeat(driveUsed)}\n`
   }
   // Post result
   return string
@@ -200,6 +211,7 @@ class Deck{
     this.reset();
     this.shuffle();
     this.desperado = false;
+    this.driveUsed = 0;
   }
 
   // Discard hand, move queen of hearts and jokers into deck, shuffle deck
@@ -234,6 +246,7 @@ class Deck{
     this.hand = [];
     this.discard = [];
     this.desperado = false;
+    this.driveUsed = 0;
     
     const suits = ['Hearts', 'Spades', 'Clubs', 'Diamonds'];
     const values = ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King'];
