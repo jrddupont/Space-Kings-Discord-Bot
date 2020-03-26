@@ -66,8 +66,8 @@ client.on("message", message => {
       message.channel.send("nice")
       return
     }
-	
-		
+    
+        
     // Make sure it is an integer and not too large
     if(Number.isInteger(parseInt(number, 10)) && number > 0 && number < 40){
       // Some more logic to prevent huge flips
@@ -82,9 +82,9 @@ client.on("message", message => {
         }
       }
     } else if number == ""{
-		// Flip without param should return one flip
-		flipCard(message.channel, author, 1)
-	}else {
+        // Flip without param should return one flip
+        flipCard(message.channel, author, 1)
+    }else {
       // >:(
       message.channel.send(rawNumber + " was not a nice number! >:(")
     }
@@ -139,7 +139,7 @@ function is_face_card(card){
         return true
       }
     }
-	return false
+    return false
 }
 
 function is_joker(card,desperado){
@@ -167,7 +167,7 @@ function generateFlipMessage(hand, deck) {
       critical += 1
     } else {
       if(is_face_card(card))
-	  {
+      {
           faceCards += 1
       }
     }
@@ -249,25 +249,25 @@ class Deck{
   
   schadenfreude(channel) {
     this.discardHand()
-	
-	// reveal one card
-	let card = userArray[author].deal();
-	
-	if (is_face_card(card) || is_joker(card,this.desperado)){
+
+    // reveal one card
+    let card = userArray[author].deal();
+    
+    if (is_face_card(card) || is_joker(card,this.desperado)){
       channel.send("You flipped a ${card}. You get 1 drive")
-	  
-	  // add back into deck
-	   this.deck.push(card)
-	   this.hand = []
-	   
-	   //shuffle in
-	   this.shuffle()
-	}
-	else{
+  
+      // add back into deck
+       this.deck.push(card)
+       this.hand = []
+       
+       //shuffle in
+       this.shuffle()
+    }
+    else{
       channel.send("You flipped a ${card}. No Drive")
-	  this.discardHand()
-	}
-		
+      this.discardHand()
+    }
+        
   }
   // Move cards from the hand into the discard
   discardHand(){
