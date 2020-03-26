@@ -47,11 +47,11 @@ client.on("message", message => {
   } else if (text === "curse you!") {
     message.channel.send('You deservered it')
   } else if (text === "desperado") || (text === "billy the kid") {
-	userArray[author].desperado = true;
-	message.channel.send('You are now a desperado!')
+    userArray[author].desperado = true;
+    message.channel.send('You are now a desperado!')
   } else if (text === "wimp") || (text === "~desperado") {
-	userArray[author].desperado = false;
-	message.channel.send('You are no longer a desperado!')
+    userArray[author].desperado = false;
+    message.channel.send('You are no longer a desperado!')
   } else if (text.startsWith("flip")) {
     // split off the number of cards to flip
     var rawNumber = text.split(" ")[1]
@@ -175,7 +175,7 @@ class Deck{
     this.discard = [];
     this.reset();
     this.shuffle();
-	this.desperado = false;
+    this.desperado = false;
   }
 
   // Discard hand, move queen of hearts and jokers into deck, shuffle deck
@@ -209,8 +209,8 @@ class Deck{
     this.deck = [];
     this.hand = [];
     this.discard = [];
-	this.desperado = false;
-	
+    this.desperado = false;
+    
     const suits = ['Hearts', 'Spades', 'Clubs', 'Diamonds'];
     const values = ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King'];
 
