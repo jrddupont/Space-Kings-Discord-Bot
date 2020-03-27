@@ -9,8 +9,8 @@
     "undesperado": ["undesperado", "~desperado", "wimp"],
     "schadenfreude": ["schadenfreude", "the-s-word", "the s word", "the joyful feelings of pleasure from watching someone fail", "haha nerd"],
     "boom": ["boom"],
-    "showDeck" : ["showDeck", "show deck", "sd"],
-    "uploadImage" : ["upload"]
+    "pocketJoker": [ "pocketJoker", "pocket joker"],
+    "showDeck" : ["showDeck", "show deck", "sd"]
   },
   "simpleResponses" : {
     "despacito": "This is so sad",
