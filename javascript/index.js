@@ -1,5 +1,8 @@
 const Discord = require("discord.js")
-const fs = require('fs');
+const fs = require('fs')
+const java = require("java")
+
+java.classpath.push("java/bin/ImageGeneratorPrimary.jar");
 
 const client = new Discord.Client()
 
@@ -28,6 +31,7 @@ client.on("ready", () => {
     { keys: rawConfig.alias.undesperado, method: undesperado },
     { keys: rawConfig.alias.schadenfreude, method: schadenfreude },
     { keys: rawConfig.alias.boom, method: boom },
+    { keys: rawConfig.alias.pocketJoker, method: pocketJoker },
     { keys: rawConfig.alias.showDeck, method: showDeck }
   ]
   config.simpleResponses = rawConfig.simpleResponses
@@ -49,7 +53,6 @@ client.on("message", message => {
     if(text.startsWith(prefix)){
       prefixFound = true
       text = text.substr(prefix.length).trim().toLowerCase().replace(/\s+/g, " ")
-      console.log(text)
       break
     }
   }
@@ -83,11 +86,17 @@ client.on("message", message => {
 })
 
 
+
+
+
+
 function shuffle(author, message, text){
   userArray[author].reset()
   userArray[author].shuffle()
   message.channel.send('Deck shuffled!')
 }
+
+
 function flip(author, message, text){
   if(text === "flip"){
     text = "flip 1"
@@ -104,22 +113,33 @@ function flip(author, message, text){
   // Make sure it is an integer and not too large
   if(Number.isInteger(parseInt(number, 10)) && number > 0 && number <= 54){
     // Some more logic to prevent huge flips
-    if(text.includes("!")){
-      var textToSend = flipCard(author, number)
-      message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
-    } else {
-      if(number > 15){
-        message.channel.send("Are you sure you want to flip that many? Add a space and an exclamation point after the command to confirm!")
-      } else {
-        var textToSend = flipCard(author, number)
-        message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
+    if(number <= 15 || text.includes("!")){
+      // Make sure there is no open hand
+      userArray[author].discardHand()
+      userArray[author].driveUsed = 0
+      // Generate the hand 
+      for(var i = 0; i < number; i++){ 
+        userArray[author].deal();
       }
+
+      var summaryString = generateSummaryMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
+      var cardString = userArray[author].hand.join()
+
+      java.callStaticMethod("ImageGeneratorPrimary", "generateImage", cardString, function(err, results) {
+        if(err) { console.error(err); return; } 
+        message.channel
+          .send(summaryString, new Discord.MessageAttachment(results))
+          .then((newMessage) => {userArray[author].lastMessage = newMessage});
+      });
+
+    } else {
+      message.channel.send("Are you sure you want to flip that many? Add a space and an exclamation point after the command to confirm!")
     }
   }else {
-    // >:(
-    message.channel.send(rawNumber + " was not a nice number! >:(")
+    message.channel.send(rawNumber + " was not a nice number! >:(") // >:(
   }
 }
+
 function drive(author, message, text){
   if(userArray[author].lastMessage == null){
     message.channel.send("Please flip some cards before you use drive.")
@@ -130,11 +150,21 @@ function drive(author, message, text){
       message.delete()
       userArray[author].deal()
       userArray[author].driveUsed += 1
-      var textToSend = generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
-      userArray[author].lastMessage.edit(textToSend)
+
+      var summaryString = generateSummaryMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
+      var cardString = userArray[author].hand.join()
+
+      java.callStaticMethod("ImageGeneratorPrimary", "generateImage", cardString, function(err, results) {
+        if(err) { console.error(err); return; } 
+        userArray[author].lastMessage.edit(summaryString, new Discord.MessageAttachment(results))
+      });
     }
   }
 }
+
+
+
+
 function desperado(author, message, text){
   userArray[author].desperado = true;
   message.channel.send('You are now a desperado!')
@@ -151,6 +181,12 @@ function boom(author, message, text){
   userArray[author].boom()
   message.channel.send("Jokers and the Queen of Hearts have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
 }
+function pocketJoker(author, message, text){
+  // Handles the "Extra Explosions" ultimate 
+  userArray[author].pocketJoker()
+  message.channel.send("Joker(s) have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
+}
+
 function showDeck(author, message, text){
   // Prints the deck for debug
   var string = "Cards in deck: \n"
@@ -161,22 +197,6 @@ function showDeck(author, message, text){
   message.channel.send(string)
 }
 
-
-
-
-// Flips n cards
-function flipCard(author, numberOfCards) {
-  // Make sure there is no open hand
-  userArray[author].discardHand()
-  userArray[author].driveUsed = 0
-  // Generate the hand 
-  for(var i = 0; i < numberOfCards; i++){ 
-    userArray[author].deal();
-  }
-
-  // Deal the cards and also count jokers, face cards, and criticals
-  return generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
-}
 
 function isFaceCard(card){
   const faceCardNames = ['Ace', 'Jack', 'Queen', 'King']
@@ -195,7 +215,7 @@ function isCritical(card, isDesperado){
 }
 
 
-function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
+function generateSummaryMessage(hand, deck, isDesperado, driveUsed) {
 
   var jokers = 0
   var faceCards = 0
@@ -212,11 +232,7 @@ function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
   }
 
   // Construct a string to send
-  var string = "You flipped: \n"
-  // Add all the flipped cards
-  for(var i = 0; i < hand.length; i++){
-    string += "-" + hand[i] + "\n"
-  }
+  var string = ""
 
   // Make sure the "you flipped" sentance is grammatically correct 
   if(faceCards == 0){
@@ -243,6 +259,7 @@ function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
     string += `and ${critical} criticals!!!\n`
   }
 
+
   if(deck.length == 1){
     string += "You have 1 card remaining.\n"
   } else {
@@ -252,6 +269,7 @@ function generateFlipMessage(hand, deck, isDesperado, driveUsed) {
   if (driveUsed >= 1){
     string += `Used ${driveUsed} drive${"!".repeat(driveUsed)}\n`
   }
+
   // Post result
   return string
 }
@@ -271,7 +289,7 @@ class Deck{
   }
 
   // Discard hand, move queen of hearts and jokers into deck, shuffle deck
-  boom(channel){
+  boom(){
     this.discardHand()
     var cardsToShuffleBackIn = []
     for(var i = 0; i < this.discard.length; i++){
@@ -285,9 +303,29 @@ class Deck{
         this.discard.splice(index, 1);
       }
     }
-    this.deck = this.deck.concat(this.cardsToShuffleBackIn)
-    this.shuffle()
-    channel.send(cardsToShuffleBackIn)
+    if(cardsToShuffleBackIn.length > 0){
+      this.deck = this.deck.concat(cardsToShuffleBackIn)
+      this.shuffle()
+    }
+  }
+
+  pocketJoker(){
+    var cardsToShuffleBackIn = []
+    for(var i = 0; i < this.hand.length; i++){
+      if(isJoker(this.hand[i], this.desperado)){
+        cardsToShuffleBackIn.push(this.hand[i])
+      }
+    }
+    for(var i = 0; i < cardsToShuffleBackIn.length; i++){
+      const index = this.hand.indexOf(cardsToShuffleBackIn[i]);
+      if (index > -1) {
+        this.hand.splice(index, 1);
+      }
+    }
+    if(cardsToShuffleBackIn.length > 0){
+      this.deck = this.deck.concat(cardsToShuffleBackIn)
+      this.shuffle()
+    }
   }
   
   schadenfreude(channel) {

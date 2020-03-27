@@ -9,11 +9,12 @@
     "undesperado": ["undesperado", "~desperado", "wimp"],
     "schadenfreude": ["schadenfreude", "the-s-word", "the s word", "the joyful feelings of pleasure from watching someone fail", "haha nerd"],
     "boom": ["boom"],
+    "pocketJoker": [ "pocketJoker", "pocket joker"],
     "showDeck" : ["showDeck", "show deck", "sd"]
   },
   "simpleResponses" : {
     "despacito": "This is so sad",
-    "curses": "You deservered it",
-    "curse you!": "You deservered it"
+    "curses": "You deserved it",
+    "curse you!": "You deserved it"
   }
 }
