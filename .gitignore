@@ -1,6 +1,8 @@
 #Token
 token.json
 token*
+config/token*
+config/token.json
 
 # Logs
 logs

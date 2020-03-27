@@ -2,10 +2,10 @@
   "name": "discord_bot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "javascript/index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node javascript/index.js",
+    "dev": "nodemon javascript/index.js"
   },
   "keywords": [],
   "author": "",

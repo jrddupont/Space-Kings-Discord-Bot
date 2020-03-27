@@ -3,127 +3,166 @@ const fs = require('fs');
 
 const client = new Discord.Client()
 
-// When the bot logs in
-client.on("ready", () => {
-  console.log(`Logged in as ${client.user.tag}!`)
-})
+// Read the private token from the disk and uses it to start the bot
+var token = JSON.parse(fs.readFileSync('config/token.json')).token
+client.login(token)
+
+
 
 // An array of all the people who have typed anything as a KV pair
 // IE ["adam" -> deck1, "eve" -> deck2]
 var userArray = {}
+var config = {}
+
+// When the bot logs in
+client.on("ready", () => {
+  console.log(`Logged in as ${client.user.tag}!`)
+
+  var rawConfig = JSON.parse(fs.readFileSync('config/config.json'))
+  config.acceptablePrefixes = rawConfig.prefixes
+  config.commands = [
+    { keys: rawConfig.alias.shuffle, method: shuffle },
+    { keys: rawConfig.alias.flip, method: flip },
+    { keys: rawConfig.alias.drive, method: drive },
+    { keys: rawConfig.alias.desperado, method: desperado },
+    { keys: rawConfig.alias.undesperado, method: undesperado },
+    { keys: rawConfig.alias.schadenfreude, method: schadenfreude },
+    { keys: rawConfig.alias.boom, method: boom },
+    { keys: rawConfig.alias.showDeck, method: showDeck }
+  ]
+  config.simpleResponses = rawConfig.simpleResponses
+})
+
+
 
 // When the bot recieves any message
 client.on("message", message => {
 
   // Who sent the message, this is the K in the KV pair above
   var author = message.author
-
   var text = message.content
-  // Every type of prefix that is acceptable
-  var acceptablePrefixes = ["~", "`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "]
+
+  // Search all the prefixes for one that fits, if found, remove prefix from the message
   var prefixFound = false
-  // Search all the prefixes for one that fits, and remove it from the message
-  for (var i = 0; i < acceptablePrefixes.length; i++) {
-    if(message.content.startsWith(acceptablePrefixes[i])){
+  for (const index in config.acceptablePrefixes) {
+    const prefix = config.acceptablePrefixes[index]
+    if(text.startsWith(prefix)){
       prefixFound = true
-      text = message.content.substr(acceptablePrefixes[i].length).trim().toLowerCase()
+      text = text.substr(prefix.length).trim().toLowerCase().replace(/\s+/g, " ")
+      console.log(text)
       break
     }
   }
   if(!prefixFound){
     return
   }
-
+  
   // Initialize new users
   if(!(author in userArray)){
     userArray[author] = new Deck()
   }
 
-  // Here are all the commands
-  if (text === "shuffle") {
-    userArray[author].reset()
-    userArray[author].shuffle()
-    message.channel.send('Deck shuffled!')
-  } else if (text === "curse you!") {
-    message.channel.send('You deservered it')
-  } else if (text === "desperado" || text === "billy the kid") {
-    userArray[author].desperado = true;
-    message.channel.send('You are now a desperado!')
-  } else if (text === "wimp" || text === "~desperado") {
-    userArray[author].desperado = false;
-    message.channel.send('You are no longer a desperado!')
-  } else if (
-      text === "schadenfreude" || 
-      text === "the-s-word" || 
-      text === "the s word" || 
-      text === "the joyful feelings of pleasure from watching someone fail" || 
-      text === "haha nerd"
-    ) {
-    userArray[author].schadenfreude(message.channel);
-  } else if (text.startsWith("flip")) {
-    if(text === "flip"){
-      text = "flip 1"
+  // Find the command run and call it
+  for (const commandIndex in config.commands) {
+    const command = config.commands[commandIndex]
+    for (const keyIndex in command.keys) {
+      const key = command.keys[keyIndex]
+      if(text.startsWith(key)){
+        command.method(message.author, message, text)
+        return
+      }
     }
-    // split off the number of cards to flip
-    var rawNumber = text.split(" ")[1]
-    var number = parseInt(rawNumber, 10)
-    // Check for... special cases
-    if(number == 69 || number == 420){
-      message.channel.send("nice")
+  }
+
+  for (const key in config.simpleResponses) {
+    if(text.startsWith(key)){
+      message.channel.send(config.simpleResponses[key])
       return
-    }
-    
-        
-    // Make sure it is an integer and not too large
-    if(Number.isInteger(parseInt(number, 10)) && number > 0 && number <= 54){
-      // Some more logic to prevent huge flips
-      if(text.includes("!")){
-        var textToSend = flipCard(author, number)
-        message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
-      } else {
-        if(number > 15){
-          message.channel.send("Are you sure you want to flip that many? Add a space and an exclamation point after the command to confirm!")
-        } else {
-          var textToSend = flipCard(author, number)
-          message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
-        }
-      }
-    }else {
-      // >:(
-      message.channel.send(rawNumber + " was not a nice number! >:(")
-    }
-  }else if (text.startsWith("boom")) {
-    // Handles the "Extra Explosions" ultimate 
-    userArray[author].boom()
-    message.channel.send("Jokers and the Queen of Hearts have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
-  }else if (text.startsWith("show deck")) {
-    // Prints the deck for debug
-    var string = "Cards in deck: \n"
-    var arrayToPrint = userArray[author].deck.slice().sort()
-    for(var i = 0; i < arrayToPrint.length; i++){
-      string += "-" + arrayToPrint[i] + "\n"
-    }
-    message.channel.send(string)
-  }else if (text.startsWith("drive")) {
-    if(userArray[author].lastMessage == null){
-      message.channel.send("Please flip some cards before you use drive.")
-    }else{ 
-      if(userArray[author].deck.length == 0){
-        message.channel.send("You have no more cards to flip!")
-      }else{
-        message.delete()
-        userArray[author].deal()
-        userArray[author].driveUsed += 1
-        var textToSend = generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
-        userArray[author].lastMessage.edit(textToSend)
-      }
     }
   }
 })
 
-// Read the private token from the disk and uses it to start the bot
-var token = JSON.parse(fs.readFileSync('token.json')).token
-client.login(token)
+
+function shuffle(author, message, text){
+  userArray[author].reset()
+  userArray[author].shuffle()
+  message.channel.send('Deck shuffled!')
+}
+function flip(author, message, text){
+  if(text === "flip"){
+    text = "flip 1"
+  }
+  // split off the number of cards to flip
+  var rawNumber = text.split(" ")[1]
+  var number = parseInt(rawNumber, 10)
+  // Check for... special cases
+  if(number == 69 || number == 420){
+    message.channel.send("nice")
+    return
+  }
+  
+  // Make sure it is an integer and not too large
+  if(Number.isInteger(parseInt(number, 10)) && number > 0 && number <= 54){
+    // Some more logic to prevent huge flips
+    if(text.includes("!")){
+      var textToSend = flipCard(author, number)
+      message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
+    } else {
+      if(number > 15){
+        message.channel.send("Are you sure you want to flip that many? Add a space and an exclamation point after the command to confirm!")
+      } else {
+        var textToSend = flipCard(author, number)
+        message.channel.send(textToSend).then((newMessage) => {userArray[author].lastMessage = newMessage});
+      }
+    }
+  }else {
+    // >:(
+    message.channel.send(rawNumber + " was not a nice number! >:(")
+  }
+}
+function drive(author, message, text){
+  if(userArray[author].lastMessage == null){
+    message.channel.send("Please flip some cards before you use drive.")
+  }else{ 
+    if(userArray[author].deck.length == 0){
+      message.channel.send("You have no more cards to flip!")
+    }else{
+      message.delete()
+      userArray[author].deal()
+      userArray[author].driveUsed += 1
+      var textToSend = generateFlipMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
+      userArray[author].lastMessage.edit(textToSend)
+    }
+  }
+}
+function desperado(author, message, text){
+  userArray[author].desperado = true;
+  message.channel.send('You are now a desperado!')
+}
+function undesperado(author, message, text){
+  userArray[author].desperado = false;
+  message.channel.send('You are no longer a desperado!')
+}
+function schadenfreude(author, message, text){
+  userArray[author].schadenfreude(message.channel);
+}
+function boom(author, message, text){
+  // Handles the "Extra Explosions" ultimate 
+  userArray[author].boom()
+  message.channel.send("Jokers and the Queen of Hearts have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
+}
+function showDeck(author, message, text){
+  // Prints the deck for debug
+  var string = "Cards in deck: \n"
+  var arrayToPrint = userArray[author].deck.slice().sort()
+  for(var i = 0; i < arrayToPrint.length; i++){
+    string += "-" + arrayToPrint[i] + "\n"
+  }
+  message.channel.send(string)
+}
+
+
+
 
 // Flips n cards
 function flipCard(author, numberOfCards) {
