@@ -1,5 +1,8 @@
 const Discord = require("discord.js")
-const fs = require('fs');
+const fs = require('fs')
+const java = require("java")
+
+java.classpath.push("java/bin/ImageGeneratorPrimary.jar");
 
 const client = new Discord.Client()
 
@@ -28,7 +31,8 @@ client.on("ready", () => {
     { keys: rawConfig.alias.undesperado, method: undesperado },
     { keys: rawConfig.alias.schadenfreude, method: schadenfreude },
     { keys: rawConfig.alias.boom, method: boom },
-    { keys: rawConfig.alias.showDeck, method: showDeck }
+    { keys: rawConfig.alias.showDeck, method: showDeck },
+    { keys: rawConfig.alias.uploadImage, method: uploadImage }
   ]
   config.simpleResponses = rawConfig.simpleResponses
 })
@@ -159,6 +163,12 @@ function showDeck(author, message, text){
     string += "-" + arrayToPrint[i] + "\n"
   }
   message.channel.send(string)
+}
+function uploadImage(author, message, text){
+  java.callStaticMethod("ImageGeneratorPrimary", "generateImage", "test", function(err, results) {
+    if(err) { console.error(err); return; } 
+    message.channel.send("", new Discord.MessageAttachment(results));
+  });
 }
 
 

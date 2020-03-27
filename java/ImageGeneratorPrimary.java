@@ -23,8 +23,23 @@ public class ImageGeneratorPrimary {
 			//System.exit( 0 );
 		}
 		
-		//String[] cardNames = args[0].split( "," );
-		String[] cardNames = new String[]{
+
+		
+	}
+
+	public static boolean hasRunBefore = false;
+	public static String generateImage(String cards) throws IOException {
+		String[] cardNames;
+		if(hasRunBefore){
+			cardNames = new String[]{
+				"Joker",
+				"Joker",
+				"Joker",
+				"Joker",
+				"Joker",
+			};
+		}else{
+			cardNames = new String[]{
 				"Joker",
 				"5 of Clubs",
 				"10 of Spades",
@@ -35,8 +50,12 @@ public class ImageGeneratorPrimary {
 				"5 of Clubs",
 				"10 of Spades",
 				"5 of Clubs",
-		};
+			};
+		}
+		hasRunBefore = true;
+		//String[] cardNames = args[0].split( "," );
 		
+			
 		int cardSpacing = Math.max( ( imageWidth - cardWidth ) / cardNames.length, cardMinSpacing );
 		
 		int imageWidth = cardWidth + cardSpacing * (cardNames.length - 1);
@@ -51,7 +70,7 @@ public class ImageGeneratorPrimary {
 		for ( int i = 0; i < cardNames.length; i++ ) {
 			String cardName = cardNames[i];
 			
-			BufferedImage cardImage = ImageIO.read( new File( "Cards/" + cardName + ".png" ) );
+			BufferedImage cardImage = ImageIO.read( new File( "java/cards/" + cardName + ".png" ) );
 			
 			int specialRaise = 0;
 			if( isSpecial( cardName ) ){
@@ -72,8 +91,9 @@ public class ImageGeneratorPrimary {
 			
 		}
 		
-		ImageIO.write( img, "png", new File( "Output/output.png" ) );
-		
+		ImageIO.write( img, "png", new File( "java/output/output.png" ) );
+
+		return "java/output/output.png";
 	}
 	
 	private static boolean isSpecial( String cardName ){
