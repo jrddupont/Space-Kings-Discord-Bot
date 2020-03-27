@@ -4,84 +4,110 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Random;
 
 public class ImageGeneratorPrimary {
 	
+	// The size of the card images
 	private static int cardWidth = 140;
 	private static int cardHeight = 190;
+	
+	// The minimum space between cards.  This should be large enough that you can always see the suit and number on the top left of the card
 	private static int cardMinSpacing = 36;
+	
+	// The width of the output image
 	private static int imageWidth = 296;
-	private static int importantCardRaiseHeight = 0;
+	
+	// How much random vertical positioning randomness to add
 	private static int randomHeight = 10;
 	
+	// How large the padding around the edge of the image should be
+	private static int padding = 10;
+	
+	// How many cards to wrap after
+	private static int wrapAfter = 10;
+	
+	// How far down to place each row from the last
+	private static int rowVerticalSpacing = 60;
+	
+	// How far to the side to place each subsequent row
+	private static int rowHorizontalSpacing =  20;
+	
+	// Where the card images are
+	private static String cardDirectory = "Cards/";
+	private static String outputDirectory = "Output/";
+	
+	// What format to output images in - JPEG may be better if size is an issue
+	private static String outputFileType = "png";
+	
+	private static HashMap<String, BufferedImage> cardImages = new HashMap<>();
+	private static Random rand = new Random();
+	
 	public static void main( String[] args ) throws IOException {
-		
-		if( args.length	!= 1 ){
-			//System.out.println( "Please provide a comma separated list of cards in the format \"Ace of Spades, 4 of Clubs\"" );
-			//System.exit( 0 );
-		}
-		
-
-		
+		precacheImages();
+		generateImage( "Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts" );
 	}
-
-	public static boolean hasRunBefore = false;
-	public static String generateImage(String cards) throws IOException {
-		String[] cardNames;
-		if(hasRunBefore){
-			cardNames = new String[]{
-				"Joker",
-				"Joker",
-				"Joker",
-				"Joker",
-				"Joker",
-			};
-		}else{
-			cardNames = new String[]{
-				"Joker",
-				"5 of Clubs",
-				"10 of Spades",
-				"King of Clubs",
-				"Ace of Spades",
-				"7 of Hearts",
-				"Ace of Hearts",
-				"5 of Clubs",
-				"10 of Spades",
-				"5 of Clubs",
-			};
+	
+	/**
+	 * Loads all images in the cardDirectory folder into cardImages in the format [cardName -> BufferedImage]
+	 */
+	public static void precacheImages() throws IOException {
+		File[] files = new File( cardDirectory ).listFiles();
+		for( File file : files ){
+			String cardName = file.getName().replace( ".png", "" );
+			BufferedImage cardImage = ImageIO.read( file );
+			cardImages.put( cardName, cardImage );
 		}
-		hasRunBefore = true;
-		//String[] cardNames = args[0].split( "," );
+	}
+	
+	/**
+	 * Generates an image containing a wrapped grid of card images and returns the path to the image
+	 */
+	public static String generateImage(String cards) throws IOException {
 		
-			
+		// Make sure card images have been pre-cached
+		if( cardImages.size() == 0 ){
+			System.out.println( "Card images were not precached - This may cause a one-time slowdown" );
+			precacheImages();
+		}
+		
+		// Separate the input into separate card names
+		String[] cardNames = cards.split( "," );
+		
+		// How far each card should be from the its neighbors
 		int cardSpacing = Math.max( ( imageWidth - cardWidth ) / cardNames.length, cardMinSpacing );
 		
-		int imageWidth = cardWidth + cardSpacing * (cardNames.length - 1);
-		int imageHeight = cardHeight + importantCardRaiseHeight + randomHeight;
+		// The size of the output image
+		int extraRowsWidth = (int) Math.floor( cardNames.length / wrapAfter ) * rowHorizontalSpacing;
+		int imageWidth = cardWidth + (padding * 2 ) + cardSpacing * (wrapAfter) + extraRowsWidth;
+		
+		int extraRowsHeight = (int) Math.floor( cardNames.length / wrapAfter ) * rowVerticalSpacing;
+		int imageHeight = cardHeight + (padding * 2 ) + randomHeight + extraRowsHeight;
 		
 		BufferedImage img = new BufferedImage( imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB );
 		
-		Random rand = new Random();
-		
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
+		//g.setColor( new Color( 7, 99, 36 ) );
+		//g.fillRect( 0, 0, imageWidth, imageHeight );
+		
 		for ( int i = 0; i < cardNames.length; i++ ) {
+			
+			// Where on a coarse card-sized X,Y grid this card is
+			int cardX = i % wrapAfter;
+			int cardY = (int) Math.floor( i / wrapAfter );
+			
 			String cardName = cardNames[i];
 			
-			BufferedImage cardImage = ImageIO.read( new File( "java/cards/" + cardName + ".png" ) );
-			
-			int specialRaise = 0;
-			if( isSpecial( cardName ) ){
-				specialRaise = importantCardRaiseHeight;
-			}
-			
-			int x = i * cardSpacing;
-			int y = importantCardRaiseHeight - specialRaise;
+			int x = padding + cardX * cardSpacing + rowHorizontalSpacing * cardY;
+			int y = padding + cardY * rowVerticalSpacing;
 			
 			y += rand.nextDouble() * randomHeight;
 			
+			BufferedImage cardImage = cardImages.get( cardName );
 			g.drawImage( cardImage, x, y, cardWidth, cardHeight, null );
 			
 			if( !isSpecial( cardName ) ){
@@ -91,9 +117,15 @@ public class ImageGeneratorPrimary {
 			
 		}
 		
-		ImageIO.write( img, "png", new File( "java/output/output.png" ) );
-
-		return "java/output/output.png";
+		String outputFilePath = outputDirectory + "/" + generateImageName();
+		
+		ImageIO.write( img, outputFileType, new File( outputFilePath ) );
+		
+		return outputFilePath;
+	}
+	
+	private static String generateImageName(){
+		return "cards_" + System.nanoTime() + "." + outputFileType;
 	}
 	
 	private static boolean isSpecial( String cardName ){
