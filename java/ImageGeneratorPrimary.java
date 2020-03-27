@@ -19,7 +19,7 @@ public class ImageGeneratorPrimary {
 	private static int cardMinSpacing = 36;
 	
 	// The width of the output image
-	private static int imageWidth = 296;
+	private static int baseImageWidth = 296;
 	
 	// How much random vertical positioning randomness to add
 	private static int randomHeight = 10;
@@ -43,8 +43,12 @@ public class ImageGeneratorPrimary {
 	// What format to output images in - JPEG may be better if size is an issue
 	private static String outputFileType = "png";
 	
+	// How many output images to cycle through
+	private static int maxImages = 3;
+	
 	private static HashMap<String, BufferedImage> cardImages = new HashMap<>();
 	private static Random rand = new Random();
+	private static int imageNumber = 0;
 	
 	public static void main( String[] args ) throws IOException {
 		precacheImages();
@@ -78,11 +82,12 @@ public class ImageGeneratorPrimary {
 		String[] cardNames = cards.split( "," );
 		
 		// How far each card should be from the its neighbors
-		int cardSpacing = Math.max( ( imageWidth - cardWidth ) / cardNames.length, cardMinSpacing );
+		int cardSpacing = Math.max( ( baseImageWidth - cardWidth ) / cardNames.length, cardMinSpacing );
 		
 		// The size of the output image
 		int extraRowsWidth = (int) Math.floor( cardNames.length / wrapAfter ) * rowHorizontalSpacing;
-		int imageWidth = cardWidth + (padding * 2 ) + cardSpacing * (wrapAfter) + extraRowsWidth;
+		System.out.println( extraRowsWidth );
+		int imageWidth = cardWidth + (padding * 2 ) + cardSpacing * Math.min( wrapAfter, cardNames.length - 1 ) + extraRowsWidth;
 		
 		int extraRowsHeight = (int) Math.floor( cardNames.length / wrapAfter ) * rowVerticalSpacing;
 		int imageHeight = cardHeight + (padding * 2 ) + randomHeight + extraRowsHeight;
@@ -125,7 +130,9 @@ public class ImageGeneratorPrimary {
 	}
 	
 	private static String generateImageName(){
-		return "cards_" + System.nanoTime() + "." + outputFileType;
+		imageNumber = ( imageNumber + 1 ) % maxImages;
+		
+		return "cards_" + imageNumber + "." + outputFileType;
 	}
 	
 	private static boolean isSpecial( String cardName ){
