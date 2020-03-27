@@ -1,5 +1,5 @@
 {
-  "prefixes" : ["~", "`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "],
+  "prefixes" : ["-", "~", "`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "],
 
   "alias" : {
     "shuffle": ["shuffle", "mix it up, yo"],

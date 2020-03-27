@@ -6,9 +6,16 @@ java.classpath.push("java/bin/ImageGeneratorPrimary.jar");
 
 const client = new Discord.Client()
 
-// Read the private token from the disk and uses it to start the bot
-var token = JSON.parse(fs.readFileSync('config/token.json')).token
-client.login(token)
+java.callStaticMethod("ImageGeneratorPrimary", "precacheImages", function(err, results) {
+  if(err) { console.error(err); return; } 
+  
+  // Read the private token from the disk and uses it to start the bot
+  var token = JSON.parse(fs.readFileSync('config/token.json')).token
+  client.login(token)
+
+});
+
+
 
 
 
