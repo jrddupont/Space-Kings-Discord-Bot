@@ -37,14 +37,14 @@ public class ImageGeneratorPrimary {
 	private static int rowHorizontalSpacing =  20;
 	
 	// Where the card images are
-	private static String cardDirectory = "java/cards/";
-	private static String outputDirectory = "java/output/";
+	private static String cardDirectory = "Cards/";
+	private static String outputDirectory = "Output/";
 	
 	// What format to output images in - JPEG may be better if size is an issue
 	private static String outputFileType = "png";
 	
 	// How many output images to cycle through
-	private static int maxImages = 6;
+	private static int maxImages = 3;
 	
 	private static float nonSpecialAlpha = 0.75f;
 	
@@ -122,7 +122,6 @@ public class ImageGeneratorPrimary {
 			if( !isSpecial( cardName ) ){
 				g.setComposite( alphaComposite );
 				
-				g.setColor( new Color( x, y, cardWidth, cardHeight ) );
 				g.drawImage( cardImages.get( "darkening" ), x, y, cardWidth, cardHeight, null );
 				
 				g.setComposite( originalComposite );
