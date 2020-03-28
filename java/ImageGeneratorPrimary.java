@@ -44,7 +44,7 @@ public class ImageGeneratorPrimary {
 	private static String outputFileType = "png";
 	
 	// How many output images to cycle through
-	private static int maxImages = 3;
+	private static int maxImages = 6;
 	
 	private static HashMap<String, BufferedImage> cardImages = new HashMap<>();
 	private static Random rand = new Random();
@@ -95,8 +95,8 @@ public class ImageGeneratorPrimary {
 		
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
-		g.setColor( new Color( 7, 99, 36 ) );
-		g.fillRect( 0, 0, imageWidth, imageHeight );
+		//g.setColor( new Color( 7, 99, 36 ) );
+		//g.fillRect( 0, 0, imageWidth, imageHeight );
 		
 		for ( int i = 0; i < cardNames.length; i++ ) {
 			
