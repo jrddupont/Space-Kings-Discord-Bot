@@ -52,7 +52,7 @@ public class ImageGeneratorPrimary {
 	
 	public static void main( String[] args ) throws IOException {
 		precacheImages();
-		generateImage( "Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts,Joker,5 of Clubs,2 of Clubs,King of Hearts" );
+		generateImage( "Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker" );
 	}
 	
 	/**
@@ -85,18 +85,18 @@ public class ImageGeneratorPrimary {
 		int cardSpacing = Math.max( ( baseImageWidth - cardWidth ) / cardNames.length, cardMinSpacing );
 		
 		// The size of the output image
-		int extraRowsWidth = (int) Math.floor( cardNames.length / wrapAfter ) * rowHorizontalSpacing;
-		int imageWidth = cardWidth + (padding * 2 ) + cardSpacing * Math.min( wrapAfter, cardNames.length - 1 ) + extraRowsWidth;
+		int extraRowsWidth = (int) Math.floor( ( cardNames.length - 1 ) / wrapAfter ) * rowHorizontalSpacing;
+		int imageWidth = cardWidth + (padding * 2 ) + cardSpacing * ( Math.min( wrapAfter, cardNames.length ) - 1 ) + extraRowsWidth;
 		
-		int extraRowsHeight = (int) Math.floor( cardNames.length / wrapAfter ) * rowVerticalSpacing;
+		int extraRowsHeight = (int) Math.floor( ( cardNames.length - 1 ) / wrapAfter ) * rowVerticalSpacing;
 		int imageHeight = cardHeight + (padding * 2 ) + randomHeight + extraRowsHeight;
 		
 		BufferedImage img = new BufferedImage( imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB );
 		
 		Graphics2D g = (Graphics2D) img.getGraphics();
 		
-		//g.setColor( new Color( 7, 99, 36 ) );
-		//g.fillRect( 0, 0, imageWidth, imageHeight );
+		g.setColor( new Color( 7, 99, 36 ) );
+		g.fillRect( 0, 0, imageWidth, imageHeight );
 		
 		for ( int i = 0; i < cardNames.length; i++ ) {
 			
