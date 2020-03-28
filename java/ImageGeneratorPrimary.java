@@ -122,7 +122,6 @@ public class ImageGeneratorPrimary {
 			if( !isSpecial( cardName ) ){
 				g.setComposite( alphaComposite );
 				
-				g.setColor( new Color( x, y, cardWidth, cardHeight ) );
 				g.drawImage( cardImages.get( "darkening" ), x, y, cardWidth, cardHeight, null );
 				
 				g.setComposite( originalComposite );
