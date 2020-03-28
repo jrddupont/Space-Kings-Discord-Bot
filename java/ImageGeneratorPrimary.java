@@ -37,8 +37,8 @@ public class ImageGeneratorPrimary {
 	private static int rowHorizontalSpacing =  20;
 	
 	// Where the card images are
-	private static String cardDirectory = "java/cards/";
-	private static String outputDirectory = "java/output/";
+	private static String cardDirectory = "Cards/";
+	private static String outputDirectory = "Output/";
 	
 	// What format to output images in - JPEG may be better if size is an issue
 	private static String outputFileType = "png";
@@ -46,13 +46,17 @@ public class ImageGeneratorPrimary {
 	// How many output images to cycle through
 	private static int maxImages = 6;
 	
+	private static float nonSpecialAlpha = 0.75f;
+	
 	private static HashMap<String, BufferedImage> cardImages = new HashMap<>();
 	private static Random rand = new Random();
 	private static int imageNumber = 0;
+	private static Composite originalComposite;
+	private static AlphaComposite alphaComposite = AlphaComposite.getInstance( AlphaComposite.SRC_OVER, nonSpecialAlpha );
 	
 	public static void main( String[] args ) throws IOException {
 		precacheImages();
-		generateImage( "Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker,Joker" );
+		generateImage( "Joker,Joker,Joker,Joker,Joker,4 of Hearts,Joker,2 of Diamonds,Joker,Joker,Joker,Joker,Joker" );
 	}
 	
 	/**
@@ -94,6 +98,7 @@ public class ImageGeneratorPrimary {
 		BufferedImage img = new BufferedImage( imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB );
 		
 		Graphics2D g = (Graphics2D) img.getGraphics();
+		originalComposite = g.getComposite();
 		
 		//g.setColor( new Color( 7, 99, 36 ) );
 		//g.fillRect( 0, 0, imageWidth, imageHeight );
@@ -115,8 +120,13 @@ public class ImageGeneratorPrimary {
 			g.drawImage( cardImage, x, y, cardWidth, cardHeight, null );
 			
 			if( !isSpecial( cardName ) ){
-				g.setColor( new Color( 0, 0, 0, 50 ) );
-				g.fillRect( x, y, cardWidth, cardHeight );
+				g.setComposite( alphaComposite );
+				
+				g.setColor( new Color( x, y, cardWidth, cardHeight ) );
+				g.drawImage( cardImages.get( "darkening" ), x, y, cardWidth, cardHeight, null );
+				
+				g.setComposite( originalComposite );
+				
 			}
 			
 		}
