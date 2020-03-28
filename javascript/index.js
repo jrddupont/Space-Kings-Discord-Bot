@@ -136,7 +136,7 @@ function flip(author, message, text){
         if(err) { console.error(err); return; } 
         message.channel
           .send(summaryString, new Discord.MessageAttachment(results))
-          .then((newMessage) => {userArray[author].lastMessage = newMessage});
+          .then(newMessage => {userArray[author].lastMessage = newMessage});
       });
 
     } else {
@@ -163,7 +163,10 @@ function drive(author, message, text){
 
       java.callStaticMethod("ImageGeneratorPrimary", "generateImage", cardString, function(err, results) {
         if(err) { console.error(err); return; } 
-        userArray[author].lastMessage.edit(summaryString, new Discord.MessageAttachment(results))
+        userArray[author].lastMessage.delete()
+        message.channel
+          .send(summaryString, new Discord.MessageAttachment(results))
+          .then(newMessage => {userArray[author].lastMessage = newMessage});
       });
     }
   }

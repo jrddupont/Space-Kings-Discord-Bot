@@ -86,7 +86,6 @@ public class ImageGeneratorPrimary {
 		
 		// The size of the output image
 		int extraRowsWidth = (int) Math.floor( cardNames.length / wrapAfter ) * rowHorizontalSpacing;
-		System.out.println( extraRowsWidth );
 		int imageWidth = cardWidth + (padding * 2 ) + cardSpacing * Math.min( wrapAfter, cardNames.length - 1 ) + extraRowsWidth;
 		
 		int extraRowsHeight = (int) Math.floor( cardNames.length / wrapAfter ) * rowVerticalSpacing;
