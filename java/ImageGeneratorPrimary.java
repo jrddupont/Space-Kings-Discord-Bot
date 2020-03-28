@@ -37,8 +37,8 @@ public class ImageGeneratorPrimary {
 	private static int rowHorizontalSpacing =  20;
 	
 	// Where the card images are
-	private static String cardDirectory = "java/cards/";
-	private static String outputDirectory = "java/output/";
+	private static String cardDirectory = "Cards/";
+	private static String outputDirectory = "Output/";
 	
 	// What format to output images in - JPEG may be better if size is an issue
 	private static String outputFileType = "png";
