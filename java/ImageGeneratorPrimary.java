@@ -37,16 +37,16 @@ public class ImageGeneratorPrimary {
 	private static int rowHorizontalSpacing =  20;
 	
 	// Where the card images are
-	private static String cardDirectory = "Cards/";
-	private static String outputDirectory = "Output/";
+	private static String cardDirectory = "java/cards/";
+	private static String outputDirectory = "java/output/";
 	
 	// What format to output images in - JPEG may be better if size is an issue
 	private static String outputFileType = "png";
 	
 	// How many output images to cycle through
-	private static int maxImages = 3;
+	private static int maxImages = 6;
 	
-	private static float nonSpecialAlpha = 0.75f;
+	private static float nonSpecialAlpha = 0.4f;
 	
 	private static HashMap<String, BufferedImage> cardImages = new HashMap<>();
 	private static Random rand = new Random();

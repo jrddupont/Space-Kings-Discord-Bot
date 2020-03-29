@@ -10,7 +10,8 @@
     "schadenfreude": ["schadenfreude", "the-s-word", "the s word", "the joyful feelings of pleasure from watching someone fail", "haha nerd"],
     "boom": ["boom"],
     "pocketJoker": [ "pocketJoker", "pocket joker"],
-    "showDeck" : ["showDeck", "show deck", "sd"]
+    "showDeck" : ["showDeck", "show deck", "sd"],
+    "thonk" : ["thonk"]
   },
   "simpleResponses" : {
     "despacito": "This is so sad",

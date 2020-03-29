@@ -39,7 +39,8 @@ client.on("ready", () => {
     { keys: rawConfig.alias.schadenfreude, method: schadenfreude },
     { keys: rawConfig.alias.boom, method: boom },
     { keys: rawConfig.alias.pocketJoker, method: pocketJoker },
-    { keys: rawConfig.alias.showDeck, method: showDeck }
+    { keys: rawConfig.alias.showDeck, method: showDeck },
+    { keys: rawConfig.alias.thonk, method: thonk }
   ]
   config.simpleResponses = rawConfig.simpleResponses
 })
@@ -205,6 +206,10 @@ function showDeck(author, message, text){
     string += "-" + arrayToPrint[i] + "\n"
   }
   message.channel.send(string)
+}
+
+function thonk(author, message, text){
+  message.channel.send("", new Discord.MessageAttachment("image/thonk.jpg"))
 }
 
 
