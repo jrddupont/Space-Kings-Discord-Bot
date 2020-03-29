@@ -1,11 +1,16 @@
 const Discord = require("discord.js")
 const fs = require('fs')
 const java = require("java")
+const {execSync} = require('child_process');
 
+console.log("Building java jar...")
+execSync('buildImageJar.bat')
 java.classpath.push("java/bin/ImageGeneratorPrimary.jar");
+console.log("Java jar built.")
 
 const client = new Discord.Client()
 
+// Initialize the jar we imported above and have it load the card images into memory permanently 
 java.callStaticMethod("ImageGeneratorPrimary", "precacheImages", function(err, results) {
   if(err) { console.error(err); return; } 
   
@@ -73,7 +78,8 @@ client.on("message", message => {
     userArray[author] = new Deck()
   }
 
-  // Find the command run and call it
+  // Find the command the user typed by looping through the predefined commands and finding an alias that fits
+  // Once found, execute the command by calling it's associated function
   for (const commandIndex in config.commands) {
     const command = config.commands[commandIndex]
     for (const keyIndex in command.keys) {
@@ -85,6 +91,7 @@ client.on("message", message => {
     }
   }
 
+  // If none of the actual commands fit, search through simple responses 
   for (const key in config.simpleResponses) {
     if(text.startsWith(key)){
       message.channel.send(config.simpleResponses[key])
@@ -97,21 +104,23 @@ client.on("message", message => {
 
 
 
-
+// A simple reset and deck shuffle. This can be used in the event of an error that messes up the deck 
 function shuffle(author, message, text){
   userArray[author].reset()
   userArray[author].shuffle()
   message.channel.send('Deck shuffled!')
 }
 
-
+// The main function responsible for showing the flipped cards 
 function flip(author, message, text){
   if(text === "flip"){
     text = "flip 1"
   }
+
   // split off the number of cards to flip
   var rawNumber = text.split(" ")[1]
   var number = parseInt(rawNumber, 10)
+
   // Check for... special cases
   if(number == 69 || number == 420){
     message.channel.send("nice")
@@ -130,15 +139,8 @@ function flip(author, message, text){
         userArray[author].deal();
       }
 
-      var summaryString = generateSummaryMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
-      var cardString = userArray[author].hand.join()
-
-      java.callStaticMethod("ImageGeneratorPrimary", "generateImage", cardString, function(err, results) {
-        if(err) { console.error(err); return; } 
-        message.channel
-          .send(summaryString, new Discord.MessageAttachment(results))
-          .then(newMessage => {userArray[author].lastMessage = newMessage});
-      });
+      // Generate summary/image and send it to discord
+      postHand(author, message.channel)
 
     } else {
       message.channel.send("Are you sure you want to flip that many? Add a space and an exclamation point after the command to confirm!")
@@ -148,6 +150,8 @@ function flip(author, message, text){
   }
 }
 
+// If the user want's to flip more cards with drive, this is the method that gets called
+// It just adds one more card to the user's hand and then regenerates the summary and card image
 function drive(author, message, text){
   if(userArray[author].lastMessage == null){
     message.channel.send("Please flip some cards before you use drive.")
@@ -156,26 +160,32 @@ function drive(author, message, text){
       message.channel.send("You have no more cards to flip!")
     }else{
       message.delete()
+      userArray[author].lastMessage.delete()
       userArray[author].deal()
       userArray[author].driveUsed += 1
 
-      var summaryString = generateSummaryMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
-      var cardString = userArray[author].hand.join()
-
-      java.callStaticMethod("ImageGeneratorPrimary", "generateImage", cardString, function(err, results) {
-        if(err) { console.error(err); return; } 
-        userArray[author].lastMessage.delete()
-        message.channel
-          .send(summaryString, new Discord.MessageAttachment(results))
-          .then(newMessage => {userArray[author].lastMessage = newMessage});
-      });
+      postHand(author, message.channel)
     }
   }
 }
 
+function postHand(author, channel){
+  // Generate the summary string which will be something like "You flipped 1 face card, no jokers, and no criticals."
+  var summaryString = generateSummaryMessage(userArray[author].hand, userArray[author].deck, userArray[author].desperado, userArray[author].driveUsed)
+  // This is passed to the java image generator code
+  var cardString = userArray[author].hand.join()
+
+  // This calls the java image generation code, and then when it returns we send the summary string and new image to discord
+  java.callStaticMethod("ImageGeneratorPrimary", "generateImage", cardString, function(err, results) {
+    if(err) { console.error(err); return; } 
+    channel
+      .send(summaryString, new Discord.MessageAttachment(results))  // Send the summary/image to discord
+      .then(newMessage => {userArray[author].lastMessage = newMessage}); // The `lastMessage` member is used to delete/replace this message if the user uses drive 
+  });
+}
 
 
-
+// Handles the "Desperado" ultimate
 function desperado(author, message, text){
   userArray[author].desperado = true;
   message.channel.send('You are now a desperado!')
@@ -184,22 +194,27 @@ function undesperado(author, message, text){
   userArray[author].desperado = false;
   message.channel.send('You are no longer a desperado!')
 }
+
+// Handles the "Schadenfreude" ultimate 
 function schadenfreude(author, message, text){
   userArray[author].schadenfreude(message.channel);
 }
+
+// Handles the "Extra Explosions" ultimate 
 function boom(author, message, text){
-  // Handles the "Extra Explosions" ultimate 
   userArray[author].boom()
   message.channel.send("Jokers and the Queen of Hearts have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
 }
+// Handles the pocket joker mechanic
 function pocketJoker(author, message, text){
-  // Handles the "Extra Explosions" ultimate 
   userArray[author].pocketJoker()
   message.channel.send("Joker(s) have been shuffled back into the deck, " + userArray[author].deck.length + " cards remaining.")
 }
 
+// Prints the deck for debug
+// It is a good idea to disable this if you don't trust your users not to use it
 function showDeck(author, message, text){
-  // Prints the deck for debug
+
   var string = "Cards in deck: \n"
   var arrayToPrint = userArray[author].deck.slice().sort()
   for(var i = 0; i < arrayToPrint.length; i++){
@@ -208,6 +223,7 @@ function showDeck(author, message, text){
   message.channel.send(string)
 }
 
+// Gets you thinking 
 function thonk(author, message, text){
   message.channel.send("", new Discord.MessageAttachment("image/thonk.jpg"))
 }
@@ -303,27 +319,31 @@ class Deck{
     this.driveUsed = 0;
   }
 
-  // Discard hand, move queen of hearts and jokers into deck, shuffle deck
+  // Discard hand, move criticals and jokers into deck, shuffle deck
   boom(){
     this.discardHand()
     var cardsToShuffleBackIn = []
+    // Find the cards to move 
     for(var i = 0; i < this.discard.length; i++){
       if(isCritical(this.discard[i], this.desperado) || isJoker(this.discard[i], this.desperado)){
         cardsToShuffleBackIn.push(this.discard[i])
       }
     }
+    // Remove those cards from the hand
     for(var i = 0; i < cardsToShuffleBackIn.length; i++){
       const index = this.discard.indexOf(cardsToShuffleBackIn[i]);
       if (index > -1) {
         this.discard.splice(index, 1);
       }
     }
+    // Add cards back to deck, and shuffle deck
     if(cardsToShuffleBackIn.length > 0){
       this.deck = this.deck.concat(cardsToShuffleBackIn)
       this.shuffle()
     }
   }
 
+  // Move jokers back into the deck and shuffle deck 
   pocketJoker(){
     var cardsToShuffleBackIn = []
     for(var i = 0; i < this.hand.length; i++){
@@ -343,6 +363,7 @@ class Deck{
     }
   }
   
+  // Manually run this if someone gets a joker 
   schadenfreude(channel) {
     this.discardHand()
 
@@ -358,9 +379,9 @@ class Deck{
     } else {
       channel.send(`You flipped a ${card}, no drive`)
       this.discardHand()
-    }
-        
+    } 
   }
+  
   // Move cards from the hand into the discard
   discardHand(){
     this.discard = this.discard.concat(this.hand)
