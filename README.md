@@ -34,7 +34,7 @@ Command reference:
 | `show deck`      | Prints the cards in your deck for debug purposes in a sorted list.                                           |
 
 Notes:   
-Flip will warn you if you try to flip more than 15 cards at once, this can be bypassed by adding an exclamation point at the end like this: `!flip 20 !`
+Flip will warn you if you try to flip more than 15 cards at once, this can be bypassed by adding an exclamation point at the end like this: `!flip 20 !`  
 Schadenfreude and Boom are not automatic, they should be used by a player when the situation arises 
 
 ## Configuration
