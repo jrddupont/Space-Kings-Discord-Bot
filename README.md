@@ -31,7 +31,7 @@ Command reference:
 | `schadenfreude`  | Flips one card and tells you to add a drive if it is a face or a joker, see Schadenfreude ultimate for rules |
 | `boom`           | Shuffles criticals and jokers back into the deck, see More Explosions ultimate for rules                     |
 | `pocket joker`   | Shuffles jokers back into the deck for the pocket joker rule                                                 |
-| `show deck`      | Sorts and prints the cards in your deck for debug purposes                                                   |
+| `show deck`      | Prints the cards in your deck for debug purposes in a sorted list.                                           |
 
 Notes:   
 Flip will warn you if you try to flip more than 15 cards at once, this can be bypassed by adding an exclamation point at the end like this: `!flip 20 !`
