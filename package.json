@@ -1,14 +1,14 @@
 {
-  "name": "discord_bot",
+  "name": "CardFlippingDiscordBot",
   "version": "1.0.0",
-  "description": "",
+  "description": "Flips cards on demand for the Space Kings RPG",
   "main": "javascript/index.js",
   "scripts": {
     "start": "node javascript/index.js",
     "dev": "nodemon javascript/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "jrddupont,mrhatman,a1steaksa",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^12.0.2",
