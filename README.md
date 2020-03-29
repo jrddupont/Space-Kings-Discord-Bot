@@ -11,6 +11,8 @@ Make a file under `config/` called `token.json` and put this inside of it, using
 }
 ```
 
+To start the bot, open a command window in the root directory of the bot and type `npm run dev`.
+
 You should have a working bot now, you can test it by typing `!flip 5` and you should see something like this:  
 ![flip 5](https://i.imgur.com/qwMVa9f.png "flip 5 result")
 
