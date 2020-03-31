@@ -21,21 +21,24 @@ You should have a working bot now, you can test it by typing `!flip 5` and you s
 We did not try to code the entirety of the rules of Space Kings into this bot, just the card flipping rules. All of the rules that relate to flipping cards should have a command, but if we missed one please let us know.   
 
 Command reference:  
-| Command          | Description                                                                                                  |
-|------------------|--------------------------------------------------------------------------------------------------------------|
-| `shuffle`        | Completely rebuilds the deck and shuffles it, good for resetting.                                            |
-| `flip n`         | Flips n cards and displays them                                                                              |
-| `drive`          | Flips an additional card and adds it to the previous flip, can be used any number of times                   |
-| `desperado`      | Changes which cards count as jokers and as criticals to reflect the Desperado ultimate                       |
-| `undesperado`    | Undoes the `desperado` command                                                                               |
-| `schadenfreude`  | Flips one card and tells you to add a drive if it is a face or a joker, see Schadenfreude ultimate for rules |
-| `boom`           | Shuffles criticals and jokers back into the deck, see More Explosions ultimate for rules                     |
-| `pocket joker`   | Shuffles jokers back into the deck for the pocket joker rule                                                 |
-| `show deck`      | Prints the cards in your deck for debug purposes in a sorted list.                                           |
+| Command          | Description                                                                                                            |
+|------------------|------------------------------------------------------------------------------------------------------------------------|
+| `shuffle`        | Completely rebuilds the deck and shuffles it, good for resetting.                                                      |
+| `flip n`         | Flips n cards and displays them                                                                                        |
+| `drive`          | Flips an additional card and adds it to the previous flip, can be used any number of times                             |
+| `desperado`      | Changes which cards count as jokers and as criticals to reflect the Desperado ultimate, takes either `true` or `false` |
+| `schadenfreude`  | Flips one card and tells you to add a drive if it is a face or a joker, see Schadenfreude ultimate for rules           |
+| `boom`           | Shuffles criticals and jokers back into the deck, see More Explosions ultimate for rules                               |
+| `pocket joker`   | Shuffles jokers back into the deck for the pocket joker rule                                                           |
+| debug show deck  | Prints the cards in your deck for debug purposes in a sorted list. (See config file for actual command)                |
+| `set summary`    | Enables or disables the summary text above card flip images, takes either `true` or `false`                            |
+| `summary`        | Prints the number of remaining cards in your deck along with the number of faces, jokers, or criticals left.           |
 
 Notes:   
-Flip will warn you if you try to flip more than 15 cards at once, this can be bypassed by adding an exclamation point at the end like this: `!flip 20 !`  
-Schadenfreude and Boom are not automatic, they should be used by a player when the situation arises 
+* Flip will warn you if you try to flip more than 15 cards at once, this can be bypassed by adding an exclamation point at the end like this: `!flip 20 !`  
+* Schadenfreude and Boom are not automatic, they should be used by a player when the situation arises   
+* Debug show deck requires the current time in minutes as an argument, like `12` or `53`
+
 
 ## Configuration
 
