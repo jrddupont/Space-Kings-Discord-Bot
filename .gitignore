@@ -4,6 +4,7 @@ output_*.*
 cards_*.*
 output.png
 Output.png
+java/output/*
 
 ##### Node js
 
