@@ -1,0 +1,13 @@
+!shuffle
+!flip 5
+!drive
+!desperado
+!undesperado
+!schadenfreude
+!pocketJoker
+!I would like to see my whole deck and the minute hand reads 30
+!summary
+!show summary true
+!show summary false
+!thonk
+!despacito
