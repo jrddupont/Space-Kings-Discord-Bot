@@ -39,8 +39,10 @@ client.on("ready", () => {
 	config.acceptablePrefixes = rawConfig.prefixes
 	config.commands = [
 		{ keys: rawConfig.alias.shuffle, method: shuffle },
+		{ keys: rawConfig.alias.shiffle, method: shiffle },
 		{ keys: rawConfig.alias.flip, method: flip },
 		{ keys: rawConfig.alias.drive, method: drive },
+		{ keys: rawConfig.alias.hero, method: hero },
 		{ keys: rawConfig.alias.desperado, method: desperado },
 		{ keys: rawConfig.alias.schadenfreude, method: schadenfreude },
 		{ keys: rawConfig.alias.boom, method: boom },
@@ -134,6 +136,13 @@ function shuffle(skUser, message, argumentString){
 	message.channel.send('Deck shuffled!')
 }
 
+// A simple reset and deck shuffle. This can be used in the event of an error that messes up the deck 
+function shiffle(skUser, message, argumentString){
+	skUser.reset()
+	skUser.shuffle()
+	message.channel.send('Deck shiffled!')
+}
+
 // The main function responsible for showing the flipped cards 
 function flip(skUser, message, argumentString){
 	if(argumentString.length == 0){
@@ -161,6 +170,7 @@ function flip(skUser, message, argumentString){
 			// Make sure there is no open hand
 			skUser.discardHand()
 			skUser.driveUsed = 0
+			skUser.heroPointUsed = false
 			// Generate the hand 
 			for(var i = 0; i < number; i++){ 
 				skUser.deal();
@@ -177,19 +187,61 @@ function flip(skUser, message, argumentString){
 	}
 }
 
+function drive(skUser, message, argumentString){
+	if(argumentString.length == 0){
+		argumentString = "1"
+	}
+
+	var numberString = argumentString.split(" ")[0]
+
+	var number = parseInt(numberString, 10)
+
+	// Check for... special cases
+	if(number == 69){
+		message.channel.send("nice")
+		return
+	}
+	if(number == 420){
+		message.channel.send("blaze it *dab*")
+		return
+	}
+	
+	// Make sure it is an integer and not too large
+	if(Number.isInteger(number) && number > 0 && number <= 54){
+		driveN(skUser, message, number, false)
+	}else {
+		message.channel.send(number + " was not a nice number! >:(") // >:(
+	}
+}
+
+
+function hero(skUser, message, argumentString){
+	if(skUser.heroPointUsed){
+		message.channel.send("You already used a hero point this hand!")
+	}else{
+		driveN(skUser, message, 2, true)	
+	}
+}
+
 // If the user want's to flip more cards with drive, this is the method that gets called
 // It just adds one more card to the user's hand and then regenerates the summary and card image
-function drive(skUser, message, argumentString){
+function driveN(skUser, message, numberOfCards, isHeroPoint){
 	if(skUser.lastMessage == null){
-		message.channel.send("Please flip some cards before you use drive.")
+		message.channel.send("Please flip some cards before you use drive or hero points.")
 	}else{ 
-		if(skUser.deck.length == 0){
-			message.channel.send("You have no more cards to flip!")
+		if(skUser.deck.length - numberOfCards <= 0){
+			message.channel.send("There are not enough cards in your deck to flip that many!")
 		}else{
 			message.delete()
 			skUser.lastMessage.delete()
-			skUser.deal()
-			skUser.driveUsed += 1
+			for(var i = 0; i < numberOfCards; i++){
+				skUser.deal()
+			}
+			if(isHeroPoint){
+				skUser.heroPointUsed = true
+			}else{
+				skUser.driveUsed += numberOfCards
+			}
 
 			postHand(skUser, message.channel)
 		}

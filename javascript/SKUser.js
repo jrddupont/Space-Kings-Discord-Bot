@@ -11,6 +11,7 @@ class SKUser{
 		this.isDesperado = false;
 		this.showSummary = true;
 		this.driveUsed = 0;
+		this.heroPointUsed = false;
 	}
 
 	generateSummaryMessage() {
@@ -69,7 +70,15 @@ class SKUser{
 
 		// Drive is always shown 
 		if (this.driveUsed >= 1){
-			string += `Used ${this.driveUsed} drive${"!".repeat(this.driveUsed)}\n`
+			if(this.heroPointUsed){
+				string += `Used ${this.driveUsed} drive and a hero point${"!".repeat(this.driveUsed + 1)}\n`
+			} else {
+				string += `Used ${this.driveUsed} drive${"!".repeat(this.driveUsed)}\n`
+			}
+		} else {
+			if(this.heroPointUsed){
+				string += `Used a hero point!\n`
+			}
 		}
 
 		// Post result
@@ -82,7 +91,7 @@ class SKUser{
 		var cardsToShuffleBackIn = []
 		// Find the cards to move 
 		for(var i = 0; i < this.discard.length; i++){
-			if(isCritical(this.discard[i], this.desperado) || isJoker(this.discard[i], this.desperado)){
+			if(helper.isCritical(this.discard[i], this.desperado) || helper.isJoker(this.discard[i], this.desperado)){
 				cardsToShuffleBackIn.push(this.discard[i])
 			}
 		}
@@ -104,7 +113,7 @@ class SKUser{
 	pocketJoker(){
 		var cardsToShuffleBackIn = []
 		for(var i = 0; i < this.hand.length; i++){
-			if(isJoker(this.hand[i], this.desperado)){
+			if(helper.isJoker(this.hand[i], this.desperado)){
 				cardsToShuffleBackIn.push(this.hand[i])
 			}
 		}

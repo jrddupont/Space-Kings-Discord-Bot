@@ -25,7 +25,8 @@ Command reference:
 |------------------|------------------------------------------------------------------------------------------------------------------------|
 | `shuffle`        | Completely rebuilds the deck and shuffles it, good for resetting.                                                      |
 | `flip n`         | Flips n cards and displays them                                                                                        |
-| `drive`          | Flips an additional card and adds it to the previous flip, can be used any number of times                             |
+| `drive n`        | Flips an additional n cards and adds them to the previous flip, can be used any number of times                        |
+| `hero`           | Flips two additional cards and adds them to the previous flip, can only be used one time per card flip                 |
 | `desperado`      | Changes which cards count as jokers and as criticals to reflect the Desperado ultimate, takes either `true` or `false` |
 | `schadenfreude`  | Flips one card and tells you to add a drive if it is a face or a joker, see Schadenfreude ultimate for rules           |
 | `boom`           | Shuffles criticals and jokers back into the deck, see More Explosions ultimate for rules                               |

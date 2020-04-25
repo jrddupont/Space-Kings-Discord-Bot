@@ -3,8 +3,10 @@
 
 	"alias" : {
 		"shuffle": ["shuffle"],
+		"shiffle": ["shiffle"],
 		"flip": ["flip", "f"],
 		"drive": ["drive"],
+		"hero": ["hero"],
 		"desperado": ["desperado", "billy the kid"],
 		"schadenfreude": ["schadenfreude", "the-s-word", "the s word", "the joyful feelings of pleasure from watching someone fail", "haha nerd"],
 		"boom": ["boom"],
