@@ -50,7 +50,8 @@ client.on("ready", () => {
 		{ keys: rawConfig.alias.debugShowDeck, method: debugShowDeck },
 		{ keys: rawConfig.alias.showSummary, method: showSummary },
 		{ keys: rawConfig.alias.summarizeDeck, method: summarizeDeck },
-		{ keys: rawConfig.alias.thonk, method: thonk }
+		{ keys: rawConfig.alias.thonk, method: thonk },
+		{ keys: rawConfig.alias.antijoker, method: antijoker }
 	]
 	config.simpleResponses = rawConfig.simpleResponses
 })
@@ -67,7 +68,7 @@ client.on("message", message => {
 	// Search all the prefixes for one that fits, if found, remove prefix from the message
 	var prefixFound = false
 	for (const index in config.acceptablePrefixes) {
-		const prefix = config.acceptablePrefixes[index]
+		const prefix = config.acceptablePrefixes[index].toLowerCase()
 		if(text.startsWith(prefix)){
 			prefixFound = true
 			text = text.substr(prefix.length).trim().replace(/\s+/g, " ")
@@ -335,4 +336,9 @@ function summarizeDeck(skUser, message, argumentString){
 // Gets you thinking 
 function thonk(skUser, message, argumentString){
 	message.channel.send("", new Discord.MessageAttachment("image/thonk.jpg"))
+}
+
+// Gets you thinking 
+function antijoker(skUser, message, argumentString){
+	message.channel.send("", new Discord.MessageAttachment("image/antijoker.gif"))
 }

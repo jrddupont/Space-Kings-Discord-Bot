@@ -14,7 +14,8 @@
 		"debugShowDeck" : ["I would like to see my whole deck and the minute hand reads"],
 		"summarizeDeck" : ["summarizeDeck", "summary", "summarize", "summarize deck", "sum"],
 		"showSummary": ["showSummary", "show summary", "setSummary", "set summary"],
-		"thonk" : ["thonk"]
+		"thonk" : ["thonk"],
+		"antijoker" : ["antijoker"]
 	},
 	"simpleResponses" : {
 		"despacito": "This is so sad",
