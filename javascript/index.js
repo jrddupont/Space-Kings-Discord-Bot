@@ -78,15 +78,6 @@ client.on( "message", message => {
 	if( !( author in userArray ) ) {
 		userArray[author] = new sku.SKUser()
 	}
-	
-	// Check for shuffle because it uses regex
-	let shuffleResult = messageText.match( shuffleRegex );
-	if( shuffleResult != null ) {
-		messageText = messageText.substr( shuffleResult.length ).trim()
-		console.log( "Running " + shuffleResult + " with argument: " + messageText )
-		shuffle( userArray[ message.author ], message, messageText )
-		return
-	}
 
 	// Find the command the user typed by looping through the predefined commands and finding an alias that fits
 	// Once found, execute the command by calling it's associated function
@@ -102,6 +93,15 @@ client.on( "message", message => {
 				return
 			}
 		}
+	}
+
+	// Check for shuffle because it uses regex
+	let shuffleResult = messageText.match( shuffleRegex );
+	if( shuffleResult != null ) {
+		messageText = messageText.substr( shuffleResult.length ).trim()
+		console.log( "Running " + shuffleResult + " with argument: " + messageText )
+		shuffle( userArray[ message.author ], message, messageText )
+		return
 	}
 
 	// If none of the actual commands fit, search through simple responses 
