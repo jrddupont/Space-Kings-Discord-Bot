@@ -13,18 +13,17 @@ console.log("Java jar built.")
 const client = new Discord.Client()
 
 // Initialize the jar we imported above and have it load the card images into memory permanently 
-java.callStaticMethod("ImageGeneratorPrimary", "precacheImages", function(err, results) {
-	if(err) { console.error(err); return; } 
+java.callStaticMethod( "ImageGeneratorPrimary", "precacheImages", function( err, results ) {
+	if( err ) { console.error(err); return; } 
 	
 	// Read the private token from the disk and uses it to start the bot
-	var token = JSON.parse(fs.readFileSync('config/token.json')).token
-	client.login(token)
+	var token = JSON.parse(fs.readFileSync( 'config/token.json' ) ).token
+	client.login( token )
 
-});
+} );
 
-
-
-
+// A regex pattern to match variations on the word "Shuffle"
+var shuffleRegex = RegExp( "s[a-z]+([a-z])(\1|el|le)[a-z]*" );
 
 // An array of all the people who have typed anything as a KV pair
 // IE ["adam" -> skUser1, "eve" -> skUser2]
@@ -32,14 +31,12 @@ var userArray = {}
 var config = {}
 
 // When the bot logs in
-client.on("ready", () => {
+client.on( "ready", () => {
 	console.log(`Logged in as ${client.user.tag}!`)
 
 	var rawConfig = JSON.parse(fs.readFileSync('config/config.json'))
 	config.acceptablePrefixes = rawConfig.prefixes
 	config.commands = [
-		{ keys: rawConfig.alias.shuffle, method: shuffle },
-		{ keys: rawConfig.alias.shiffle, method: shiffle },
 		{ keys: rawConfig.alias.flip, method: flip },
 		{ keys: rawConfig.alias.drive, method: drive },
 		{ keys: rawConfig.alias.hero, method: hero },
@@ -54,37 +51,42 @@ client.on("ready", () => {
 		{ keys: rawConfig.alias.antijoker, method: antijoker }
 	]
 	config.simpleResponses = rawConfig.simpleResponses
-})
-
-
+} )
 
 // When the bot recieves any message
-client.on("message", message => {
+client.on( "message", message => {
 
 	// Who sent the message, this is the K in the KV pair above
 	var author = message.author
-	var text = message.content.toLowerCase()
+	var messageText = message.content.toLowerCase().trim()
 
 	// Search all the prefixes for one that fits, if found, remove prefix from the message
 	var prefixFound = false
-	for (const index in config.acceptablePrefixes) {
+	for ( const index in config.acceptablePrefixes ) {
 		const prefix = config.acceptablePrefixes[index].toLowerCase()
-		if(text.startsWith(prefix)){
+		if( messageText.startsWith( prefix ) ){
 			prefixFound = true
-			text = text.substr(prefix.length).trim().replace(/\s+/g, " ")
+			messageText = messageText.substr( prefix.length ).trim().replace( /\s+/g, " " )
 			break
 		}
 	}
-	if(!prefixFound){
+	if( !prefixFound ){
 		return
 	}
 	
 	// Initialize new users
-	if(!(author in userArray)){
+	if( !( author in userArray ) ) {
 		userArray[author] = new sku.SKUser()
 	}
-
- 
+	
+	// Check for shuffle because it uses regex
+	let shuffleResult = messageText.match( shuffleRegex );
+	if( shuffleResult != null ) {
+		messageText = messageText.substr( shuffleResult.length ).trim()
+		console.log( "Running " + shuffleResult + " with argument: " + messageText )
+		shuffle( userArray[ message.author ], message, messageText )
+		return
+	}
 
 	// Find the command the user typed by looping through the predefined commands and finding an alias that fits
 	// Once found, execute the command by calling it's associated function
@@ -92,11 +94,11 @@ client.on("message", message => {
 		const command = config.commands[commandIndex]
 		for (const keyIndex in command.keys) {
 			const key = command.keys[keyIndex].toLowerCase()
-			if(text.startsWith(key)){
-				// Remove command text from text and pass it in
-				text = text.substr(key.length).trim()
-				console.log("Running " + key + " with argument: " + text)
-				command.method(userArray[message.author], message, text)
+			if(messageText.startsWith(key)){
+				// Remove command text from message text and pass it in
+				messageText = messageText.substr(key.length).trim()
+				console.log("Running " + key + " with argument: " + messageText)
+				command.method(userArray[message.author], message, messageText)
 				return
 			}
 		}
@@ -104,15 +106,12 @@ client.on("message", message => {
 
 	// If none of the actual commands fit, search through simple responses 
 	for (const key in config.simpleResponses) {
-		if(text.startsWith(key)){
-			message.channel.send(config.simpleResponses[key])
+		if( messageText.startsWith( key ) ){
+			message.channel.send( config.simpleResponses[ key ] )
 			return
 		}
 	}
 })
-
-
-
 
 function showSummary(skUser, message, argumentString){
 	if(argumentString.length != 0){
@@ -129,19 +128,12 @@ function showSummary(skUser, message, argumentString){
 	}
 }
 
-
-// A simple reset and deck shuffle. This can be used in the event of an error that messes up the deck 
-function shuffle(skUser, message, argumentString){
+// Shuffles a user's deck and sends an appropriate message
+// Note: 3rd argument is purely the word that is echoed
+function shuffle( skUser, message, shuffleName ){
 	skUser.reset()
 	skUser.shuffle()
-	message.channel.send('Deck shuffled!')
-}
-
-// A simple reset and deck shuffle. This can be used in the event of an error that messes up the deck 
-function shiffle(skUser, message, argumentString){
-	skUser.reset()
-	skUser.shuffle()
-	message.channel.send('Deck shiffled!')
+	message.channel.send( 'Deck ' + shuffleName )
 }
 
 // The main function responsible for showing the flipped cards 
@@ -215,7 +207,6 @@ function drive(skUser, message, argumentString){
 	}
 }
 
-
 function hero(skUser, message, argumentString){
 	if(skUser.heroPointUsed){
 		message.channel.send("You already used a hero point this hand!")
@@ -263,7 +254,6 @@ function postHand(skUser, channel){
 			.then(newMessage => {skUser.lastMessage = newMessage}); // The `lastMessage` member is used to delete/replace this message if the user uses drive 
 	});
 }
-
 
 // Handles the "Desperado" ultimate
 function desperado(skUser, message, argumentString){
