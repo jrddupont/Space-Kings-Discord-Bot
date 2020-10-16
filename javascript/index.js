@@ -98,9 +98,9 @@ client.on( "message", message => {
 	// Check for shuffle because it uses regex
 	let shuffleResult = messageText.match( shuffleRegex );
 	if( shuffleResult != null ) {
-		messageText = messageText.substr( shuffleResult.length ).trim()
+		//messageText = messageText.substr( shuffleResult.length ).trim()
 		console.log( "Running " + shuffleResult + " with argument: " + messageText )
-		shuffle( userArray[ message.author ], message, messageText )
+		shuffle( userArray[ message.author ], message, messageText + "d!" )
 		return
 	}
 
