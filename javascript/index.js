@@ -110,6 +110,7 @@ client.on( "message", message => {
 		}
 
 		shuffle( userArray[ message.author ], message, filteredMessageText )
+
 		return
 	}
 
