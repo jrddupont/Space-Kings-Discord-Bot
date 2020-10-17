@@ -106,7 +106,7 @@ client.on( "message", message => {
 		if( filteredMessageText.endsWith( "e" ) ){
 			formattedMessageText += "d"
 		} else if ( filteredMessageText.endsWith( "el" ) ){
-			formattedMessageText += "'d"
+			formattedMessageText += "ed"
 		}
 
 		shuffle( userArray[ message.author ], message, filteredMessageText )
