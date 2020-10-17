@@ -102,14 +102,14 @@ client.on( "message", message => {
 	if( shuffleResult != null ) {
 		console.log( "Running " + shuffleResult + " with argument: " + filteredMessageText )
 
-		let formattedMessageText = filteredMessageText
+		let formattedMessageText = messageText
 		if( filteredMessageText.endsWith( "e" ) ){
-			formattedMessageText += "d"
+			formattedMessageText += "d!"
 		} else if ( filteredMessageText.endsWith( "el" ) ){
-			formattedMessageText += "ed"
+			formattedMessageText += "ed!"
 		}
 
-		shuffle( userArray[ message.author ], message, filteredMessageText )
+		shuffle( userArray[ message.author ], message, formattedMessageText )
 
 		return
 	}
