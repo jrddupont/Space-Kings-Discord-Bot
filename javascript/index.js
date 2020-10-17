@@ -4,6 +4,7 @@ const java = require("java")
 const {execSync} = require('child_process');
 const sku = require('./SKUser.js');
 const helper = require('./SharedFunctions.js')
+const stringFunctions = require('./StringFunctions.js')
 
 console.log("Building java jar...")
 execSync('buildImageJar.bat')
@@ -96,11 +97,20 @@ client.on( "message", message => {
 	}
 
 	// Check for shuffle because it uses regex
-	let shuffleResult = messageText.match( shuffleRegex );
+	let filteredMessageText = stringFunctions.removeDiacritics( messageText )
+	let shuffleResult = filteredMessageText.match( shuffleRegex );
 	if( shuffleResult != null ) {
-		//messageText = messageText.substr( shuffleResult.length ).trim()
-		console.log( "Running " + shuffleResult + " with argument: " + messageText )
-		shuffle( userArray[ message.author ], message, messageText + "d!" )
+		console.log( "Running " + shuffleResult + " with argument: " + filteredMessageText )
+
+		let formattedMessageText = filteredMessageText
+		if( filteredMessageText.endsWith( "e" ) ){
+			formattedMessageText += "d"
+		} else if ( filteredMessageText.endsWith( "el" ) ){
+			formattedMessageText += "ed"
+		}
+
+		shuffle( userArray[ message.author ], message, filteredMessageText )
+
 		return
 	}
 
