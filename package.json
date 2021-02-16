@@ -7,6 +7,9 @@
     "start": "node javascript/index.js",
     "dev": "nodemon javascript/index.js"
   },
+  "nodemonConfig": {
+    "ignore": ["userdata/*"]
+  },
   "keywords": [],
   "author": "jrddupont,mrhatman,a1steaksa",
   "license": "ISC",

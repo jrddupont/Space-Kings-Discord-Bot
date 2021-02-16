@@ -1,18 +1,33 @@
 const helper = require('./SharedFunctions.js')
 
 class SKUser{
-	constructor(){
-		this.deck = [];
-		this.hand = [];
-		this.discard = [];
-		this.lastMessage = null;
-		this.reset();
-		this.shuffle();
-		this.isDesperado = false;
-		this.showSummary = true;
-		this.driveUsed = 0;
-		this.heroPointUsed = false;
+	constructor(skills, attributes){
+
+		this.characterName = null
+		this.isDesperado = false
+		this.showSummary = true
+
+		this.deck = []
+		this.hand = []
+		this.discard = []
+		this.lastMessage = null
+		
+		this.driveUsed = 0
+		this.heroPointUsed = false
+
+		this.skills = {}
+
+		this.reset()
+		this.shuffle()
+
+		for (let attribute in attributes) {
+			this.skills[attributes[attribute]] = 1
+		}
+		for (let skill in skills) {
+			this.skills[skills[skill]] = 0
+		}
 	}
+
 
 	generateSummaryMessage() {
 
@@ -91,7 +106,7 @@ class SKUser{
 		var cardsToShuffleBackIn = []
 		// Find the cards to move 
 		for(var i = 0; i < this.discard.length; i++){
-			if(helper.isCritical(this.discard[i], this.desperado) || helper.isJoker(this.discard[i], this.desperado)){
+			if(helper.isCritical(this.discard[i], this.isDesperado) || helper.isJoker(this.discard[i], this.isDesperado)){
 				cardsToShuffleBackIn.push(this.discard[i])
 			}
 		}
@@ -113,7 +128,7 @@ class SKUser{
 	pocketJoker(){
 		var cardsToShuffleBackIn = []
 		for(var i = 0; i < this.hand.length; i++){
-			if(helper.isJoker(this.hand[i], this.desperado)){
+			if(helper.isJoker(this.hand[i], this.isDesperado)){
 				cardsToShuffleBackIn.push(this.hand[i])
 			}
 		}
@@ -136,7 +151,7 @@ class SKUser{
 		// reveal one card
 		let card = this.deal();
 		
-		if (helper.isFaceCard(card) || helper.isJoker(card, this.desperado)){
+		if (helper.isFaceCard(card) || helper.isJoker(card, this.isDesperado)){
 			channel.send(`You flipped a ${card}, +1 drive`)
 			// add back into deck
 			this.deck.push(card)
@@ -159,8 +174,9 @@ class SKUser{
 		this.deck = [];
 		this.hand = [];
 		this.discard = [];
-		this.desperado = false;
+		//this.isDesperado = false;
 		this.driveUsed = 0;
+		this.lastMessage = null
 		
 		const suits = ['Hearts', 'Spades', 'Clubs', 'Diamonds'];
 		const values = ['Ace', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'Jack', 'Queen', 'King'];

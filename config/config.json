@@ -1,5 +1,7 @@
 {
-	"prefixes" : ["-", "~", "`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "],
+	"prefixes": ["-", "~", "`", "!", "'", "Honorable Card Flipper Bot esq., would you kindly "],
+	"attributes": ["brawn", "agility", "intelligence", "wit", "charm", "presence"],
+	"skills": ["athletics", "biology", "computers", "empathy", "engineering", "explosives", "firearms", "investigation", "lying", "melee", "perform", "piloting", "persuasion", "sneaking", "spacewise", "survival", "telekinesis", "telepathy"],
 
 	"alias" : {
 		"flip": ["flip", "f"],
@@ -13,7 +15,9 @@
 		"summarizeDeck" : ["summarizeDeck", "summary", "summarize", "summarize deck", "sum"],
 		"showSummary": ["showSummary", "show summary", "setSummary", "set summary"],
 		"thonk" : ["thonk"],
-		"antijoker" : ["antijoker"]
+		"antijoker" : ["antijoker"],
+		"user" : ["user"],
+		"move" : ["move", "relocate"]
 	},
 	"simpleResponses" : {
 		"despacito": "This is so sad",
