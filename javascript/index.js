@@ -1,10 +1,17 @@
+// An array of all the people who have typed anything as a KV pair
+// IE ["adam" -> skUser1, "eve" -> skUser2]
+var userArray = {}
+var config = {}
+
+module.exports = {getConfig, getUserArray};
+
 const Discord = require("discord.js")
 const fs = require('fs')
-const path = require('path');
 const java = require("java")
 const {execSync} = require('child_process');
 const sku = require('./SKUser.js');
 const helper = require('./SharedFunctions.js')
+const user = require('./UserFunctions.js')
 const stringFunctions = require('./StringFunctions.js');
 const { Console } = require("console");
 
@@ -29,10 +36,6 @@ java.callStaticMethod( "ImageGeneratorPrimary", "precacheImages", function( err,
 // A regex pattern to match variations on the word "Shuffle"
 var shuffleRegex = RegExp( "s[a-z]+([a-z])(\1|el|le)[a-z]*" );
 
-// An array of all the people who have typed anything as a KV pair
-// IE ["adam" -> skUser1, "eve" -> skUser2]
-var userArray = {}
-var config = {}
 
 // When the bot logs in
 client.on( "ready", () => {
@@ -53,7 +56,7 @@ client.on( "ready", () => {
 		{ keys: rawConfig.alias.summarizeDeck, method: summarizeDeck },
 		{ keys: rawConfig.alias.thonk, method: thonk },
 		{ keys: rawConfig.alias.antijoker, method: antijoker },
-		{ keys: rawConfig.alias.user, method: user },
+		{ keys: rawConfig.alias.user, method: user.user },
 		{ keys: rawConfig.alias.move, method: moveFlip }
 	]
 	config.simpleResponses = rawConfig.simpleResponses
@@ -89,7 +92,7 @@ client.on( "message", message => {
 	// Initialize new users
 	if( !( author in userArray ) ) {
 		userArray[author] = new sku.SKUser(config.skills, config.attributes)
-		restoreUser(message)
+		user.restoreUser(message)
 	}
 
 	// Find the command the user typed by looping through the predefined commands and finding an alias that fits
@@ -135,240 +138,6 @@ client.on( "message", message => {
 	}
 })
 
-function user(skUser, message, argumentString){
-	var command = argumentString.toLowerCase().trim()
-	if(command.length == 0){
-		message.channel.send("Available commands: `save`, `list`, `load`, `import`, `export`, `create`, and `set`")
-		return
-	}
-	if(command == "save"){
-		saveUserData(skUser, message, false)
-		return
-	}
-	if(command == "list"){
-		listUserData(message)
-		return
-	}
-	if(command.startsWith("load")){
-		var character = command.split(" ")[1]
-		saveUserData(skUser, message, true)
-		loadUserData(message, character, false)
-		return
-	}
-	if(command.startsWith("import")){
-		var rawCommand = message.content.trim()
-		var jsonToImport = rawCommand.substr(rawCommand.indexOf("{")).trim()
-		saveUserData(skUser, message, true)
-		importCharacter(message, jsonToImport)
-		return
-	}
-	if(command == "export"){
-		saveUserData(skUser, message, true)
-		exportCharacter(message, skUser)
-		return
-	}
-	if(command.startsWith("create")){
-		var character = command.split(" ")[1]
-		saveUserData(skUser, message, true)
-		var newCharacter = createCharacter(message, character)
-		if(newCharacter != null){
-			saveUserData(newCharacter, message, true)
-		}
-		return
-	}
-	if(command.startsWith("set")){
-		var setCommand = command.substr("load".length).trim()
-		var updatedCharacter = setUserData(skUser, message, setCommand)
-		if(updatedCharacter != null){
-			saveUserData(updatedCharacter, message, true)
-		}
-		return
-	}
-}
-
-function disambiguateAlias(message, alias) {
-	var allSkills = config.attributes.concat(config.skills)
-	var disambiguation = allSkills.filter(skill => skill.startsWith(alias))
-
-	if(disambiguation.length == 0){
-		message.channel.send("Unknown skill or attribute: " + alias)
-		return null
-	} else if(disambiguation.length == 1) {
-		return disambiguation[0]
-	} else if(disambiguation.length > 1) {
-		message.channel.send("Ambiguous alias. Could refer to: " + disambiguation.join(", "))
-		return null
-	}
-}
-
-function setUserData(skUser, message, setCommand) {
-	console.log(setCommand)
-	var splitCommand = setCommand.split(/\s+/)
-	var skill = disambiguateAlias(message, splitCommand[0])
-	var points = parseInt(splitCommand[1], 10)
-
-	if(skill == null){
-		return null
-	}
-	if(!Number.isInteger(points)){
-		message.channel.send("Invalid number of points: " + points)
-		return null
-	}
-	skUser.skills[skill] = points
-	message.channel.send("Set " + skill + " to " + points)
-	return skUser
-}
-
-var currentCharacterFileName = "currentCharacter.txt"
-// Synchronous
-function restoreUser(message) {
-	var userID = message.author.id
-	var userPath = path.join('.', 'userdata', userID, currentCharacterFileName)
-
-	try {
-		character = fs.readFileSync(userPath, 'utf8');
-		return loadUserData(message, character, true)
-	} catch (err) {
-		console.log("Could not restore character: " + userPath)
-		console.log(err)
-		return null
-	}
-}
-
-function isValidCharacterName(character) {
-	return character != null && character.length > 0 && character.length < 128 && helper.isAlphaNumeric(character)
-}
-
-// Synchronous
-function listUserData(message) {
-	var userID = message.author.id
-	var userPath = path.join('.', 'userdata', userID)
-	try {
-		var characterNames = fs.readdirSync(userPath).filter(fileName => fileName.endsWith(".json")).map(fileName => fileName.replace(".json", ""))
-		message.channel.send("Characters: " + characterNames.join(", "))
-	} catch (err) {
-		message.channel.send("No characters. ")
-		return
-	}
-
-}
-
-// Synchronous
-function saveUserData(skUser, message, silent) {
-	if(skUser.characterName == null){
-		if(!silent){
-			message.channel.send("Please create a character before trying to save it.")
-		}
-		return
-	}
-	var userID = message.author.id
-	var userdataJSON = JSON.stringify(skUser)
-	var userPath = path.join('.', 'userdata', userID)
-	var character = skUser.characterName
-	try{
-		fs.mkdirSync(userPath, { recursive: true });
-		fs.writeFileSync(path.join(userPath, skUser.characterName + ".json"), userdataJSON);
-		fs.writeFileSync(path.join(userPath, currentCharacterFileName), character);
-		if(!silent){
-			message.channel.send("Saved character: " + character)
-		}
-	} catch (err) {
-		console.error(err)
-		message.channel.send("Failed to save character.\nSave data: `"+userdataJSON+"`")
-	}
-}
-
-// Synchronous
-function loadUserData(message, character, silent) {
-	if(!isValidCharacterName(character)){
-		message.channel.send("Invalid character name")
-		return null
-	}
-
-	var userID = message.author.id
-	var userPath = path.join('.', 'userdata', userID)
-	var jsonPath = path.join(userPath, character + ".json")
-	var jsonString = ""
-	var parsedJSON = null
-	try {
-		jsonString = fs.readFileSync(jsonPath, 'utf8');
-	} catch (err) {
-		console.log(err)
-		message.channel.send("Character not found: " + character)
-		return null
-	}
-	try {
-		parsedJSON = JSON.parse(jsonString)
-		userArray[message.author] = Object.assign(new sku.SKUser(config.skills, config.attributes), parsedJSON)
-	} catch (err) {
-		console.log(err)
-		message.channel.send("Could not parse json!")
-		return null
-	}
-
-	userArray[message.author] = Object.assign(new sku.SKUser(config.skills, config.attributes), parsedJSON)
-
-	if(!silent){
-		message.channel.send("Loaded " + character)
-	}
-
-	try{
-		fs.writeFileSync(path.join(userPath, currentCharacterFileName), character);
-	} catch (err) {
-		console.error(err)
-		message.channel.send("Failed to save which character you have selected, this is not a major problem.\nSave data: `" + character + "`")
-		return null
-	}
-
-	return userArray[message.author]
-}
-
-function importCharacter(message, jsonToImport) {
-	var parsedJSON = ""
-	try{
-		parsedJSON = JSON.parse(jsonToImport)
-	} catch (err){
-		message.channel.send("Invalid JSON")
-		return null
-	}
-	var importedUser = Object.assign(new sku.SKUser(config.skills, config.attributes), parsedJSON)
-	var character = importedUser.characterName
-	if(!isValidCharacterName(character)){
-		message.channel.send("Invalid character name")
-		return null
-	}
-
-	userArray[message.author] = importedUser
-	message.channel.send("Loaded " + character)
-
-	importedUser.reset()
-	importedUser.shuffle()
-	
-
-	return importedUser
-}
-
-function exportCharacter(message, skUser) {
-	if(skUser.characterName == null){
-		message.channel.send("No character to export, please create one.")
-		return null
-	}
-	message.channel.send("```" + JSON.stringify(skUser) + "```")
-}
-
-function createCharacter(message, character) {
-	if(!isValidCharacterName(character)){
-		message.channel.send("Invalid character name")
-		return null
-	}
-	var author = message.author
-	var newUser =  new sku.SKUser(config.skills, config.attributes)
-	newUser.characterName = character
-	userArray[author] = newUser
-	message.channel.send("Successfully created character")
-	return newUser
-}
-
 function showSummary(skUser, message, argumentString){
 	if(argumentString.length != 0){
 		if(argumentString === "true"){
@@ -401,7 +170,7 @@ function sumCardsToFlip(skUser, message, skillsString){
 		if(Number.isInteger(integer)){
 			sum += integer
 		} else {
-			var disambiguation = disambiguateAlias(message, element)
+			var disambiguation = user.disambiguateAlias(message, element)
 			if(disambiguation == null){
 				return -1337
 			} else {
@@ -614,4 +383,11 @@ function thonk(skUser, message, argumentString){
 
 function antijoker(skUser, message, argumentString){
 	message.channel.send("", new Discord.MessageAttachment("image/antijoker.gif"))
+}
+
+function getUserArray() {
+	return userArray
+}
+function getConfig() {
+	return config
 }
